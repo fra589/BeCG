@@ -1,0 +1,9 @@
+no_git
+*.hex
+*.zip
+*.o
+*.bin
+build
+builds
+ssd1306-1.8.3
+HX711_Arduino_Library

@@ -1,0 +1,61 @@
+:root {
+  /*font-family: sans-serif;*/
+  font-family: "Helvetica", "Arial", sans-serif;
+}
+body {
+  margin: 5px;
+  background-color: #d0e5ff;
+  min-width: 640px;
+  text-align: center;
+}
+.alignement-droit {
+  margin-right: 10px;
+  text-align: right;
+}
+.alignement-gauche {
+  margin-left: 10px;
+  text-align: left;
+}
+#entete {
+  width: 100%;
+}
+#logo {
+  float: left;
+  margin: 10px;
+  width: 128px;
+  height: 64px;
+}
+#settings {
+  float: right;
+  margin-left: 10px;
+  margin-right: 10px;
+  width: 64px;
+  height: 64px;
+}
+h1 {
+  margin: 0;
+  text-align: center;
+  height: 64px;
+  padding-top: 17px;
+  padding-right: 10px
+}
+#la_page {
+  width: 100%;
+}
+#la_page h2 {
+  text-align: center;
+}
+#la_page table {
+  width: 100%;
+}
+#la_page button {
+  text-align: center;
+  width: 10em;
+  height: 4em;
+}
+#pied_de_page {
+  width: 100%;
+}
+p {
+}
+</style>

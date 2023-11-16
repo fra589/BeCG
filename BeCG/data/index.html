@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Balance électronique pour mesure du Centre de Gravité des modèles réduits d'avion.">
+    <title>BeCG</title>
+    <link rel="stylesheet" media="screen" type="text/css" href="style.css"/>
+    <script type="text/javascript">
+    </script>
+  </head>
+  <body>
+	  <table id="entete">
+      <tbody>
+        <tr>
+          <td>
+            <div id="logo">
+              <img src="BeCG-couleur.svg" />
+            </div>
+          </td>
+          <td>
+            <h2>
+              Balance électronique de CentraGe
+            </h2>
+          </td>
+          <td>
+            <div id="settings">
+              <a href="settings.html" title="Configurer la balance...">
+                <img src="settings.svg" />
+              </a>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+	  <div id="la_page">
+      <h2>
+        Masses mesurées
+      </h2>
+      <p>
+        <table>
+          <thead>
+            <tr>
+              <th>bord d'attaque</th>
+              <th>bord de fuite</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td id="ba">0.0 g</td>
+              <td id="bf">0.0 g</td>
+            </tr>
+          </tbody>
+        </table>
+      </p>
+      <h2>
+        Masse totale
+      </h2>
+      <h3 id="total">0.0 g</h3>
+      <p>
+        &nbsp;
+      </p>
+      <h2>
+        Position Centre de Gravité
+      </h2>
+      <h3 id="cg">~~~~</h3>
+      <p>
+        <img src="profil.svg" />
+      </p>
+      <p class="alignement-droit" title="Remise à zéro">
+        <button id="bouton_tare">
+          Tare
+        </button>
+        &nbsp;
+        <button id="bouton_etalonage" title="Etalonner la balance...">
+          Etalonnage
+        </button>
+      </p>
+    </div>
+    <hr />
+	  <div id="pied_de_page">
+      <p>
+        BeCG - Copyright © Gauthier Brière (<a href="https://github.com/fra589/BeCG">fra589</a>) - 2023
+      </p>
+    </div>
+  </body>
+</html>
+

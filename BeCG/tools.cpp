@@ -31,8 +31,83 @@ void waitForTareButton() {
   }
 }
 
-void etalonnage() {
+void tare(void) {
+  // Tarage (remise à zéro) de la balance
 
+  #ifdef DEBUG
+    Serial.printf("Remise à zero balances...\n");
+  #endif
+
+  if (hx711_ba.wait_ready_timeout(1000)) {
+    afficheMessage("\n   Remise \x85 zero\n   balance BA...");
+    #ifdef DEBUG
+      Serial.printf("Remise à zero balance BA...\n");
+    #endif
+    hx711_ba.tare(15); // Remise à zero de balance bord d'attaque
+  }
+  if (hx711_ba.wait_ready_timeout(1000)) {
+    afficheMessage("\n   Remise \x85 zero\n   balance BF...");
+    #ifdef DEBUG
+      Serial.printf("Remise à zero balance BF...\n");
+    #endif
+    hx711_bf.tare(15); // Remise à zero de balance bord de fuite
+  }
+
+  filter_ba.reset(); // Reset filtre de Kalman BA
+  filter_bf.reset(); // Reset filtre de Kalman BF
+
+  delay(1500);
+  // Restore l'affichage normal de l'écran
+  clearDisplay();
+  affichePiedPage();
+
+  // On prévient le service web
+  tare_en_cours= false;
+  
+}
+
+void resetScale(void) {
+  // Réinitialise l'échelle des balances avant nouvel étalonnage
+  #ifdef DEBUG
+    Serial.printf("Remise à zero de l'échelle des balances...\n");
+  #endif
+  hx711_ba.set_scale();
+  hx711_bf.set_scale();
+  
+  // On prévient le service web
+  reset_scale_en_cours = false;
+}
+
+float etalon(String uri) {
+  // Etalonnage BA ou BF selon uri
+  float masse_ba = 0.0;
+  float masse_bf = 0.0;
+  float scale = 0.0;
+
+  if (uri == "/etalonba") {
+    afficheMessage("Mesure de la tare\nbord d'attaque...");
+    masse_ba = hx711_ba.get_units(15);
+    hx711_ba.set_scale(masse_ba/masseEtalon);
+    scale = hx711_ba.get_scale();
+  } else if (uri == "/etalonbf") {
+    afficheMessage("Mesure de la tare\nbord de fuite...");
+    masse_bf = hx711_bf.get_units(15);
+    hx711_bf.set_scale(masse_bf/masseEtalon);
+    scale = hx711_bf.get_scale();
+  }
+  
+  // On prévient le service web que c'est fini
+  etalonnage_en_cours = false;
+
+  delay(100);
+  clearDisplay();
+  affichePiedPage();
+
+  return scale;
+}
+
+void etalonnage(void) {
+  // Etalonnage de la balance par rappore à une masse connue
   char msgBuffer[169];
   float masse_ba = 0.0;
   float masse_bf = 0.0;
@@ -46,7 +121,7 @@ void etalonnage() {
   waitForTareButton();
   
   // Reset valeurs balances
-  afficheMessage("Remise \x85 zero\ndes balances...");
+  afficheMessage("Remise \x85 z\x82ro\ndes balances...");
   #ifdef DEBUG
     Serial.printf("Remise à zero balances...\n");
   #endif
@@ -56,32 +131,32 @@ void etalonnage() {
   hx711_bf.tare();
 
   // Tarrage bord d'attaque
-  sprintf(msgBuffer, "Placez une masse de\n%dg sur la balance\ncot\x82 bord d'attaque,\npuis pressez \"Tare\"", MASSE_ETALON);
+  sprintf(msgBuffer, "Placez une masse de\n%dg sur la balance\ncot\x82 bord d'attaque,\npuis pressez \"Tare\"", masseEtalon);
   afficheMessage(msgBuffer);
   #ifdef DEBUG
-    Serial.printf("Placez une masse de %dg sur la balance coté bord d'attaque, puis appuyez sur \"Tare\"\n", MASSE_ETALON);
+    Serial.printf("Placez une masse de %dg sur la balance coté bord d'attaque, puis appuyez sur \"Tare\"\n", masseEtalon);
   #endif
   waitForTareButton();
   afficheMessage("Mesure de la tare\nbord d'attaque...");
   #ifdef DEBUG
     Serial.printf("Mesure de la tare bord d'attaque...\n");
   #endif
-  masse_ba = hx711_ba.get_units(20);
-  hx711_ba.set_scale(masse_ba/MASSE_ETALON);
+  masse_ba = hx711_ba.get_units(15);
+  hx711_ba.set_scale(masse_ba/masseEtalon);
 
   // Tarrage bord de fuite
-  sprintf(msgBuffer, "Placez une masse de\n%dg sur la balance\ncot\x82 bord de fuite,\npuis pressez \"Tare\"", MASSE_ETALON);
+  sprintf(msgBuffer, "Placez une masse de\n%dg sur la balance\ncot\x82 bord de fuite,\npuis pressez \"Tare\"", masseEtalon);
   afficheMessage(msgBuffer);
   #ifdef DEBUG
-    Serial.printf("Placez une masse de %dg sur la balance coté bord de fuite, puis appuyez sur \"Tare\"\n", MASSE_ETALON);
+    Serial.printf("Placez une masse de %dg sur la balance coté bord de fuite, puis appuyez sur \"Tare\"\n", masseEtalon);
   #endif
   waitForTareButton();
   afficheMessage("Mesure de la tare\nbord de fuite...");
   #ifdef DEBUG
     Serial.printf("Mesure de la tare bord de fuite...\n");
   #endif
-  masse_bf = hx711_bf.get_units(20);
-  hx711_bf.set_scale(masse_bf/MASSE_ETALON);
+  masse_bf = hx711_bf.get_units(15);
+  hx711_bf.set_scale(masse_bf/masseEtalon);
 
   scale_ba = hx711_ba.get_scale();
   scale_bf = hx711_bf.get_scale();
@@ -103,6 +178,77 @@ void etalonnage() {
 
 }
 
+  void resetFactory(void) {
+  // Reset de tous les paramètres à leur valeur par défaut
+
+  #ifdef DEBUG
+    Serial.printf("Entrée dans resetFactory()\n");
+  #endif
+
+  scaleBA = DEFAULT_SCALE_BA;
+  scaleBF = DEFAULT_SCALE_BF;
+  strcpy(cli_ssid, DEFAULT_CLI_SSID);
+  strcpy(cli_pwd,  DEFAULT_CLI_PWD);
+  strcpy(ap_ssid,  DEFAULT_AP_SSID);
+  //strcpy(ap_ssid,  DEFAULT_AP_SSID);
+  String SSID_MAC = String(DEFAULT_AP_SSID + WiFi.softAPmacAddress().substring(9));
+  SSID_MAC.toCharArray(ap_ssid, MAX_SSID_LEN);
+  entraxe     = DEFAULT_ENTAXE;
+  pafBA       = DEFAULT_PAF_BA;
+  masseEtalon = DEFAULT_MASSE_ETALON;
+
+  // Sauvegarde en EEPROM
+  EEPROM_format(); // On efface tout
+  
+  EEPROM_writeStr(ADDR_NAME_VERSION, nameVersion, NAME_VERSION_LEN);
+  
+  #ifdef DEBUG
+    Serial.printf("  EEPROM.put(%d, %f)\n", ADDR_SCALE_BA, scaleBA);
+    Serial.printf("  EEPROM.put(%d, %f)\n", ADDR_SCALE_BF, scaleBF);
+  #endif
+  EEPROM.put(ADDR_SCALE_BA, scaleBA);
+  EEPROM.put(ADDR_SCALE_BF, scaleBF);
+
+  EEPROM_writeStr(ADDR_CLI_SSID, cli_ssid, MAX_SSID_LEN);
+  EEPROM_writeStr(ADDR_CLI_PWD, cli_pwd, MAX_PWD_LEN);
+  EEPROM_writeStr(ADDR_AP_SSID, ap_ssid, MAX_SSID_LEN);
+  EEPROM_writeStr(ADDR_AP_PWD, ap_pwd, MAX_PWD_LEN);
+
+  #ifdef DEBUG
+    Serial.printf("  EEPROM.put(%d, %f)\n", ADDR_ENTRAXE, entraxe);
+    Serial.printf("  EEPROM.put(%d, %f)\n", ADDR_PAF_BA, pafBA);
+    Serial.printf("  EEPROM.put(%d, %d)\n", ADDR_MASSE_ETALON, masseEtalon);
+  #endif
+  EEPROM.put(ADDR_ENTRAXE, entraxe);
+  EEPROM.put(ADDR_PAF_BA, pafBA);
+  EEPROM.put(ADDR_MASSE_ETALON, masseEtalon);
+  
+  #ifdef DEBUG
+    Serial.printf("  EEPROM.commit()\n");
+  #endif
+  EEPROM.commit();
+  
+}
+
+void EEPROM_writeStr(int address, char *value, int len) {
+  // Write string char to eeprom
+  #ifdef DEBUG
+    Serial.printf("  EEPROM_writeStr(%d, \"%s\", %d)\n", address, value, len);
+  #endif
+  for (int i=0; i<len; i++) {
+    EEPROM.write(address + i, value[i]);
+  }  
+}
+
+void EEPROM_format(void) {
+  // Efface tout le contenu de l'EEPROM
+  #ifdef DEBUG
+    Serial.printf("  EEPROM_format()\n");
+  #endif
+  for ( int i = 0 ; i < EEPROM_LENGTH ; i++ )
+    EEPROM.write(i, 0xFF);
+   EEPROM.commit();
+}
 
 // Is this an IP?
 bool isIp(String str) {
@@ -115,9 +261,8 @@ bool isIp(String str) {
   return true;
 }
 
-
 // IP to String.
-String toStringIp(IPAddress ip) {
+String IPtoString(IPAddress ip) {
   String res = "";
   for (int i = 0; i < 3; i++) {
     res += String((ip >> (8 * i)) & 0xFF) + ".";

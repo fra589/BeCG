@@ -25,15 +25,17 @@
 //----------------------------------------------------------------------------
 // Variables globales
 //----------------------------------------------------------------------------
-char nameVersion[16];
+
+char nameVersion[NAME_VERSION_LEN];
+
 // Capteurs de masse
 HX711 hx711_ba;
 HX711 hx711_bf;
 // WiFi
-char cli_ssid[32] = DEFAULT_CLI_SSID;
-char cli_pwd[63]  = DEFAULT_CLI_PWD;
-char ap_ssid[32]  = DEFAULT_AP_SSID;
-char ap_pwd[63]   = DEFAULT_AP_PWD;
+char cli_ssid[MAX_SSID_LEN] = DEFAULT_CLI_SSID;
+char cli_pwd[MAX_PWD_LEN]  = DEFAULT_CLI_PWD;
+char ap_ssid[MAX_SSID_LEN]  = DEFAULT_AP_SSID;
+char ap_pwd[MAX_PWD_LEN]   = DEFAULT_AP_PWD;
 // mDNS
 const char *myHostname = APP_NAME;
 // DNS server
@@ -50,6 +52,19 @@ float valeurMoy_bf = 0.0;
 float masseTotale = 0.0;
 float positionCG = 0.0;
 
+float entraxe       = DEFAULT_ENTAXE;
+float pafBA         = DEFAULT_PAF_BA;
+int16_t masseEtalon = DEFAULT_MASSE_ETALON;
+float scaleBA       = DEFAULT_SCALE_BA;
+float scaleBF       = DEFAULT_SCALE_BF;
+
+// Flag pour attente des services web
+bool reset_scale_en_cours = false;
+bool tare_en_cours        = false;
+bool etalonnage_en_cours  = false;
+  // Flags pour désactiver le bouton tare et les mesures
+bool disableBouton = false;
+bool disableMesure = false;
 
 //#define DT_COVARIANCE_RK 4.7e-3 // Estimation of the noise covariances (process)
 //#define DT_COVARIANCE_QK 1e-5   // Estimation of the noise covariances (observation)
@@ -61,75 +76,107 @@ TrivialKalmanFilter<float> filter_ba(DT_COVARIANCE_RK, DT_COVARIANCE_QK);
 TrivialKalmanFilter<float> filter_bf(DT_COVARIANCE_RK, DT_COVARIANCE_QK);
 
 void setup() {
-  float scaleBA;
-  float scaleBF;
   char charTmp;
   unsigned long debut;
+  char buffNameVersion[NAME_VERSION_LEN] = { 0 };
 
-  #if defined(DEBUG) || defined(DEBUG2)
+  #if defined(DEBUG) || defined(DEBUG2) || defined(DEBUG_WEB) || defined(DEBUG_WEB_VALUE)
     // Init port série pour debug
     Serial.begin(115200);
     delay(500);
     Serial.println("");
+    Serial.flush();
   #endif
-
-  // Hardware init
-  pinMode(PIN_BOUTON, INPUT_PULLUP);
 
   // Init affichage
   affichage_init();
   afficheSplash();
 
+  // Prépare la chaine de version qui permet de vérifier les données de l'EEPROM
+  strcpy(nameVersion, APP_NAME_VERSION);
+  #ifdef DEBUG
+    Serial.printf("\nStarting %s...\n\n", nameVersion);
+    Serial.flush();
+  #endif
+
+  // Hardware init
+  pinMode(PIN_BOUTON, INPUT_PULLUP);
+
   // Récupération des paramètres dans la Flash ou de leur valeur par défaut
   EEPROM.begin(EEPROM_LENGTH);
   charTmp = char(EEPROM.read(ADDR_NAME_VERSION));
   if (charTmp != 0xFF) {
-    nameVersion[0] = charTmp;
-    for (int i=1; i<16; i++) {
-      nameVersion[i] = char(EEPROM.read(ADDR_NAME_VERSION + i));
+    buffNameVersion[0] = charTmp;
+    for (int i=1; i<NAME_VERSION_LEN; i++) {
+      buffNameVersion[i] = char(EEPROM.read(ADDR_NAME_VERSION + i));
     }
+    #ifdef DEBUG
+      Serial.printf("EEPROM nameVersion..... = %s\n", buffNameVersion);
+    #endif
+    if (strncmp(nameVersion, buffNameVersion, NAME_VERSION_LEN) != 0) {
+      // Les données sauvegardées dans l'EEPROM ne correspondent pas à 
+      // la version en cours, il faut recharger les paramètres par défaut
+      #ifdef DEBUG
+        Serial.printf("Version incorrecte des données EEPROM [%s] != [%s]\n", buffNameVersion, nameVersion);
+      #endif
+      resetFactory();
+    }
+  } else {
+    // L'EEPROM est vide !
+    #ifdef DEBUG
+      Serial.printf("l'EEPROM est vide, chargement des données d'usine.\n", buffNameVersion, nameVersion);
+    #endif
+    resetFactory();
   }
-  EEPROM.get(ADDR_SCALE_BA, scaleBA);  if (scaleBA != scaleBA) scaleBA = 0.0;
-  EEPROM.get(ADDR_SCALE_BF, scaleBF);  if (scaleBF != scaleBF) scaleBF = 0.0;
+  
+  EEPROM.get(ADDR_SCALE_BA, scaleBA);  if (scaleBA != scaleBA) scaleBA = DEFAULT_SCALE_BA;
+  EEPROM.get(ADDR_SCALE_BF, scaleBF);  if (scaleBF != scaleBF) scaleBF = DEFAULT_SCALE_BF;
   charTmp = char(EEPROM.read(ADDR_CLI_SSID));
   if (charTmp != 0xFF) {
     cli_ssid[0] = charTmp;
-    for (int i=1; i<32; i++) {
+    for (int i=1; i<MAX_SSID_LEN; i++) {
       cli_ssid[i] = char(EEPROM.read(ADDR_CLI_SSID + i));
     }
   }
   charTmp = char(EEPROM.read(ADDR_CLI_PWD));
   if (charTmp != 0xFF) {
     cli_pwd[0] = charTmp;
-    for (int i=1; i<63; i++) {
+    for (int i=1; i<MAX_PWD_LEN; i++) {
       cli_pwd[i] = char(EEPROM.read(ADDR_CLI_PWD + i));
     }
   }
   charTmp = char(EEPROM.read(ADDR_AP_SSID));
   if (charTmp != 0xFF) {
     ap_ssid[0] = charTmp;
-    for (int i=1; i<32; i++) {
+    for (int i=1; i<MAX_SSID_LEN; i++) {
       ap_ssid[i] = char(EEPROM.read(ADDR_AP_SSID + i));
     }
   } else {
     String SSID_MAC = String(DEFAULT_AP_SSID + WiFi.softAPmacAddress().substring(9));
-    SSID_MAC.toCharArray(ap_ssid, 32);
+    SSID_MAC.toCharArray(ap_ssid, MAX_SSID_LEN);
   }
   charTmp = char(EEPROM.read(ADDR_AP_PWD));
   if (charTmp != 0xFF) {
     ap_pwd[0] = charTmp;
-    for (int i=1; i<63; i++) {
+    for (int i=1; i<MAX_PWD_LEN; i++) {
       ap_pwd[i] = char(EEPROM.read(ADDR_AP_PWD + i));
     }
   }
+  EEPROM.get(ADDR_ENTRAXE, entraxe);  if (entraxe != entraxe) entraxe = DEFAULT_ENTAXE;
+  EEPROM.get(ADDR_PAF_BA, pafBA);  if (pafBA != pafBA) pafBA = DEFAULT_PAF_BA;
+  EEPROM.get(ADDR_MASSE_ETALON, masseEtalon);  if (masseEtalon != masseEtalon) masseEtalon = DEFAULT_MASSE_ETALON;
+
   #ifdef DEBUG
-    Serial.print("nameVersion............ = "); Serial.println(nameVersion);
-    Serial.print("scaleBA................ = "); Serial.printf("%f\n", scaleBA);
-    Serial.print("scaleBF................ = "); Serial.printf("%f\n", scaleBF);
-    Serial.print("cli_ssid............... = "); Serial.println(cli_ssid);
-    Serial.print("cli_pwd................ = "); Serial.println(cli_pwd);
-    Serial.print("ap_ssid................ = "); Serial.println(ap_ssid);
-    Serial.print("ap_pwd................. = "); Serial.println(ap_pwd);
+    Serial.printf("nameVersion............ = %s\n", nameVersion);
+    Serial.printf("scaleBA................ = %f\n", scaleBA);
+    Serial.printf("scaleBF................ = %f\n", scaleBF);
+    Serial.printf("pafBA.................. = %f\n", pafBA);
+    Serial.printf("entraxe................ = %f\n", entraxe);
+    Serial.printf("masseEtalon............ = %d\n", masseEtalon);
+    Serial.printf("cli_ssid............... = %s\n", cli_ssid);
+    Serial.printf("cli_pwd................ = %s\n", cli_pwd);
+    Serial.printf("ap_ssid................ = %s\n", ap_ssid);
+    Serial.printf("ap_pwd................. = %s\n\n", ap_pwd);
   #endif
 
   // Init des balances
@@ -153,12 +200,21 @@ void setup() {
   // Etalonnage terminé, scale_ba = 363.738007, scale_bf = 401.615997
   //hx711_ba.set_scale(363.738007);
   //hx711_bf.set_scale(401.615997);
-  if (scaleBA != 0.0) hx711_ba.set_scale(scaleBA);
-  if (scaleBF != 0.0) hx711_bf.set_scale(scaleBF);
+  if (scaleBA != 0.0) {
+	  hx711_ba.set_scale(scaleBA);
+  } else {
+    hx711_ba.set_scale(DEFAULT_SCALE_BA);
+  }
+  if (scaleBF != 0.0) {
+    hx711_bf.set_scale(scaleBF);
+  } else {
+    hx711_ba.set_scale(DEFAULT_SCALE_BA);
+  }
 
   // Connection à un Acces Point si SSID défini
   if (cli_ssid[0] != '\0') {
     #ifdef DEBUG
+      Serial.println("");
       Serial.print("Connexion à "); Serial.print(cli_ssid);
       Serial.flush();
     #endif
@@ -235,9 +291,25 @@ void setup() {
   }
 
   // Setup web pages
+  server.enableCORS(true);
   server.on("/", handleRoot);
   server.on(ROOT_FILE, handleRoot); // index.html
   server.on("/getvalues", handleGetValues);
+  server.on("/getversion", handleGetVersion);
+  server.on("/getwifi", handleGetWifi);
+  server.on("/getnetworks", handleGetNetworks);
+  server.on("/affichage", handleAffichage);
+  server.on("/tare", handleTare);
+  server.on("/resetscale", handleResetScale);
+  server.on("/etalonba", handleEtalon);
+  server.on("/etalonbf", handleEtalon);
+  server.on("/stopmesure", handleStopMesure);
+  server.on("/startmesure", handleStartMesure);
+  server.on("/reboot", handleReboot);
+  server.on("/getsettings", handleGetSettings);
+  server.on("/setsettings", handleSetSettings);
+  server.on("/resetfactory", handleFactory);
+  
   server.onNotFound(handleNotFound);
   server.begin(); // Start web server
 
@@ -264,91 +336,82 @@ void loop() {
   }
   //HTTP
   server.handleClient();
-
-  // Etat du bouton de tarrage
-  int etat_bouton = digitalRead(PIN_BOUTON);
-  if (etat_bouton == BOUTON_ON) {
-    debut = millis();
-    do {
-      etat_bouton = digitalRead(PIN_BOUTON);
-      delay(1);
-    } while (etat_bouton != BOUTON_OFF);
-    now = millis();
-    if ((now - debut) > (APPUIS_LONG * 1000)) {
-      #ifdef DEBUG
-        Serial.printf("Etalonnages balances...\n");
-      #endif
-      etalonnage(); // Etalonnages avec une masse connue...
-    } else {
-      afficheMessage("\n   Remise \x85 zero\n   balances...");
-      #ifdef DEBUG
-        Serial.printf("Remise à zero balances.\n");
-      #endif
-      delay(500);
-      if (hx711_ba.wait_ready_timeout(1000)) {
-        afficheMessage("\n   Remise \x85 zero\n   balance BA...");
-        hx711_ba.tare(20); // Remise à zero de balance bord d'attaque
+  if (!disableBouton) {
+    // Etat du bouton de tarrage
+    int etat_bouton = digitalRead(PIN_BOUTON);
+    if (etat_bouton == BOUTON_ON) {
+      debut = millis();
+      do {
+        etat_bouton = digitalRead(PIN_BOUTON);
+        delay(1);
+        // https://forum.arduino.cc/t/yield-utilite-fonctionnement/883558
+        yield();
+      } while (etat_bouton != BOUTON_OFF);
+      now = millis();
+      if ((now - debut) > (APPUIS_LONG * 1000)) {
+        #ifdef DEBUG
+          Serial.printf("Etalonnages balances...\n");
+        #endif
+        etalonnage(); // Etalonnages avec une masse connue...
+      } else {
+        afficheMessage("\n   Remise \x85 z\x82ro\n   balances...");
+        #ifdef DEBUG
+          Serial.printf("Remise à z\x82ro balances.\n");
+        #endif
+        tare();
       }
-      if (hx711_ba.wait_ready_timeout(1000)) {
-        afficheMessage("\n   Remise \x85 zero\n   balance BF...");
-        hx711_bf.tare(20); // Remise à zero de balance bord de fuite
-      }
-
-      filter_ba.reset(); // Reset filtre de Kalman BA
-      filter_bf.reset(); // Reset filtre de Kalman BF
-
-      delay(1500);
-      clearDisplay();
-      affichePiedPage();
     }
-  }
+  } // if (!disableBouton)
 
-  // Mesure des masses
-  if (hx711_ba.wait_ready_timeout(1000) && hx711_bf.wait_ready_timeout(1000)) {
-    debut = millis();
-    masse_ba = hx711_ba.get_units();
-    masse_bf = hx711_bf.get_units();
-    now = millis();
+  if (!disableMesure) {
+    // Mesure des masses
+    if (hx711_ba.wait_ready_timeout(1000) && hx711_bf.wait_ready_timeout(1000)) {
+      debut = millis();
+      masse_ba = hx711_ba.get_units();
+      masse_bf = hx711_bf.get_units();
+      now = millis();
 
-    // On applique le filtre de Kalman
-    valeurMoy_ba = filter_ba.update(masse_ba);
-    valeurMoy_bf = filter_bf.update(masse_bf);
+      // On applique le filtre de Kalman
+      valeurMoy_ba = filter_ba.update(masse_ba);
+      valeurMoy_bf = filter_bf.update(masse_bf);
 
-    #ifdef DEBUG2
-      /*
-      Serial.printf("%0.5f %0.5f\n", masse_ba, valeurMoy_ba);
-      Serial.printf("%0.5f %0.5f\n", masse_bf, valeurMoy_bf);
-      */
-      Serial.printf("HX711 masses BA = %+0.1f,\tBF = %+0.1f,\tfiltrées BA = %+0.1f,\tBF = %+0.1f\n", \
-                    masse_ba, \
-                    masse_bf, \
-                    valeurMoy_ba, \
-                    valeurMoy_bf \
-      );
-    #endif // DEBUG2
-  } else {
-    afficheMessage("\n   Erreur capteur\n   de masse !");
-    #ifdef DEBUG2
-      Serial.printf("HX711 missing.\t");
-    #endif
-  }
+      #ifdef DEBUG2
+        /*
+        Serial.printf("%0.5f %0.5f\n", masse_ba, valeurMoy_ba);
+        Serial.printf("%0.5f %0.5f\n", masse_bf, valeurMoy_bf);
+        */
+        Serial.printf("HX711 masses BA = %+0.1f,\tBF = %+0.1f,\tfiltrées BA = %+0.1f,\tBF = %+0.1f\n", \
+                      masse_ba, \
+                      masse_bf, \
+                      valeurMoy_ba, \
+                      valeurMoy_bf \
+        );
+      #endif // DEBUG2
+    } else {
+      afficheMessage("\n   Erreur capteur\n   de masse !");
+      #ifdef DEBUG2
+        Serial.printf("HX711 missing.\t");
+      #endif
+    }
 
-  // On force l'arrondi à une décimale de la somme, ce qui évite l'affichage de -0.0
-  masseTotale = roundf((valeurMoy_ba + valeurMoy_bf) * 10) / 10;
-  // Puis, on arrondi les masse BA et BF après en avoir fait la somme
-  valeurMoy_ba = roundf(valeurMoy_ba * 10) /10;
-  valeurMoy_bf = roundf(valeurMoy_bf * 10) /10;
+    // On force l'arrondi à une décimale de la somme, ce qui évite l'affichage de -0.0
+    masseTotale = roundf((valeurMoy_ba + valeurMoy_bf) * 10) / 10;
+    // Puis, on arrondi les masse BA et BF après en avoir fait la somme
+    valeurMoy_ba = roundf(valeurMoy_ba * 10) /10;
+    valeurMoy_bf = roundf(valeurMoy_bf * 10) /10;
 
-  // Affichage :
-  afficheMasse_BA_BF(valeurMoy_ba, valeurMoy_bf);
-  afficheMasseTotale(masseTotale);
-  if ((abs(valeurMoy_ba) < 3) && (abs(valeurMoy_bf) < 3)) {
-    // Il faut une masse mini de 3 grammes sur l'un des capteurs
-    // pour déclencher le calcul et afficher le centrage. 
-    positionCG = 0.0;
-  } else {
-    positionCG = PORTE_A_FAUX_BA + ((ENTAXE_APPUIS * valeurMoy_bf)/(valeurMoy_ba + valeurMoy_bf));
-  }
-  afficheCG(positionCG);
+    // Affichage :
+    afficheMasse_BA_BF(valeurMoy_ba, valeurMoy_bf);
+    afficheMasseTotale(masseTotale);
+    if ((abs(valeurMoy_ba) < 3) && (abs(valeurMoy_bf) < 3)) {
+      // Il faut une masse mini de 3 grammes sur l'un des capteurs
+      // pour déclencher le calcul et afficher le centrage. 
+      positionCG = 0.0;
+    } else {
+      positionCG = pafBA + ((entraxe * valeurMoy_bf)/(valeurMoy_ba + valeurMoy_bf));
+    }
+    afficheCG(positionCG);
+    
+  } // if (!disableMesure)
 
 }

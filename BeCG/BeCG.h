@@ -38,28 +38,42 @@
 
   // Pour debug sur port série
   #define DEBUG
-  #define DEBUG2 // Pour debugs dans la boucle...
+  //#define DEBUG2          // Pour debugs dans la boucle...
+  #define DEBUG_WEB       // debug des interractions web
+  //#define DEBUG_WEB_VALUE // debug des appels de valeurs web
 
-  #define ORG_NAME            "fra589\0"
-  #define APP_NAME            "BeCG\0"
-  #define APP_VERSION_STRING  "v0.0\0"
-  #define APP_VERSION_DATE    "20230325\0"
-  #define COPYRIGHT           "G.Bri\x8Are 2023-2023\0"
+  #define ORG_NAME            "fra589"
+  #define APP_NAME            "BeCG"
+  #define APP_VERSION_MAJOR   "0"
+  #define APP_VERSION_MINOR   "6"
+  #define APP_VERSION_DATE    "20231120"
+  #define APP_VERSION_STRING  "v" APP_VERSION_MAJOR "." APP_VERSION_MINOR "." APP_VERSION_DATE
+  #define APP_NAME_VERSION    APP_NAME " - " APP_VERSION_STRING "\0"
+  #define COPYRIGHT           "G.Bri\x8Are 2023-2023"
+
+  #define NAME_VERSION_LEN 32
+  extern char nameVersion[NAME_VERSION_LEN];
 
   // Adresses EEProm pour sauvegarde des paramètres
   #define EEPROM_LENGTH 512
-  #define ADDR_NAME_VERSION  0 //       16 caractères de long
-  #define ADDR_SCALE_BA     16 //   0 + 16 longueur  4 octets
-  #define ADDR_SCALE_BF     20 //  16 +  4 longueur  4 octets
-  #define ADDR_CLI_SSID     24 //  20 +  4 longueur 32 octets
-  #define ADDR_CLI_PWD      56 //  18 + 32 longueur 63 octets
-  #define ADDR_AP_SSID     119 //  56 + 63 longueur 32 octets
-  #define ADDR_AP_PWD      151 // 119 + 32 longueur 63 octets
-
+  #define ADDR_NAME_VERSION    0 // =      32 caractères de long
+  #define ADDR_SCALE_BA       32 // =   0 + 32 longueur  4 octets
+  #define ADDR_SCALE_BF       36 // =  32 +  4 longueur  4 octets
+  #define ADDR_CLI_SSID       40 // =  36 +  4 longueur 32 octets
+  #define ADDR_CLI_PWD        56 // =  40 + 32 longueur 63 octets
+  #define ADDR_AP_SSID       119 // =  56 + 63 longueur 32 octets
+  #define ADDR_AP_PWD        151 // = 119 + 32 longueur 63 octets
+  #define ADDR_ENTRAXE       214 // = 151 + 63 longueur  4 octets
+  #define ADDR_PAF_BA        218 // = 214 +  4 longueur  4 octets
+  #define ADDR_MASSE_ETALON  222 // = 218 +  4 longueur  2 octets
 
   // Données mécanique de la balance
-  #define ENTAXE_APPUIS   139.5 // (mm) Distance entre las appuis BA et BF
-  #define PORTE_A_FAUX_BA  15.0 // (mm) Distance entre appuis BA et Cale bord attaque
+  #define DEFAULT_ENTAXE          125.0 // (mm) Distance entre las appuis BA et BF
+  #define DEFAULT_PAF_BA           15.0 // (mm) Distance entre appuis BA et Cale bord attaque
+  #define DEFAULT_MASSE_ETALON    500   // (g) Masse utilisée pour l'étalonnage
+  extern float entraxe;
+  extern float pafBA;
+  extern int16_t masseEtalon;
 
   // Câblages HX711 
   #define LOADCELL_BA_DOUT_PIN 12 // D6/GPIO12
@@ -69,6 +83,12 @@
   #define LOADCELL_BF_SCK_PIN  14 // D5/GPIO14
   extern HX711 hx711_bf;
 
+  // Echelle par défaut des balances 
+  #define DEFAULT_SCALE_BA 385.0
+  #define DEFAULT_SCALE_BF 385.0
+  extern float scaleBA;
+  extern float scaleBF;
+
   // Bouton tarage
   #define PIN_BOUTON        2 // Pin D4/GPIO2 - Bouton de tarage
   #define BOUTON_ON         0
@@ -76,16 +96,18 @@
   #define APPUIS_LONG       2 // 2 secondes
 
   // Valeurs des paramètres par défauts
-  #define DEFAULT_CLI_SSID "DomoPassaduy\0"       // SSID client (la minuterie se connecte si défini)
-  #define DEFAULT_CLI_PWD  "C'est1secret\0"       // WPA-PSK/WPA2-PSK client
-  #define DEFAULT_AP_SSID  "BeCG_\0"  // SSID de l'AP minuterie
-  #define DEFAULT_AP_PWD   "\0"       // WPA-PSK/WPA2-PSK AP
+  #define DEFAULT_CLI_SSID "DomoPassaduy"       // SSID client (la balance se connecte si défini)
+  #define DEFAULT_CLI_PWD  "C'est1secret"       // WPA-PSK/WPA2-PSK client
+  #define DEFAULT_AP_SSID  "BeCG_"  // SSID de l'AP balance
+  #define DEFAULT_AP_PWD   ""       // WPA-PSK/WPA2-PSK AP
 
   // Variable globales pour le WiFi
-  extern char cli_ssid[32];
-  extern char cli_pwd[63];
-  extern char ap_ssid[32];
-  extern char ap_pwd[63];
+  #define MAX_SSID_LEN 32 // Longueur maxi d'un SSID
+  #define MAX_PWD_LEN  63 // Longueur maxi des mots de passe WiFi
+  extern char cli_ssid[MAX_SSID_LEN];
+  extern char cli_pwd[MAX_PWD_LEN];
+  extern char ap_ssid[MAX_SSID_LEN];
+  extern char ap_pwd[MAX_PWD_LEN];
   // Web server
   extern ESP8266WebServer server;
   // hostname pour mDNS. devrait fonctionner au moins avec windows :
@@ -96,9 +118,15 @@
   #define ROOT_FILE "/index.html"
 
   // Masses et Centre de Gravité
+  extern TrivialKalmanFilter<float> filter_ba;
+  extern TrivialKalmanFilter<float> filter_bf;
   extern float valeurMoy_ba;
   extern float valeurMoy_bf;
   extern float masseTotale;
   extern float positionCG;
 
+  // Flags pour désactiver le bouton tare et les mesures
+  extern bool disableBouton;
+  extern bool disableMesure;
+  
 #endif // BeCG_h

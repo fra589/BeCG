@@ -22,11 +22,20 @@
 #ifndef tools_h
   #define tools_h
 
-  #define MASSE_ETALON 500
-  void etalonnage();
-  void waitForTareButton();
+  extern bool reset_scale_en_cours;
+  extern bool tare_en_cours;
+  extern bool etalonnage_en_cours;
+
+  void tare(void);
+  void resetScale(void);
+  float etalon(String uri);
+  void etalonnage(void);
+  void waitForTareButton(void);
+  void resetFactory(void);
+  void EEPROM_format(void);
+  void EEPROM_writeStr(int address, char *value, int len);
 
   bool isIp(String str);
-  String toStringIp(IPAddress ip);
+  String IPtoString(IPAddress ip);
 
 #endif // tools_h

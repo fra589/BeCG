@@ -25,7 +25,21 @@
   bool captivePortal(void);
   void handleRoot(void);
   void handleGetValues(void);
+  void handleGetVersion(void);
+  void handleGetWifi(void);
+  String getWifiNetworks(void);
+  void handleGetNetworks(void);
+  void handleAffichage(void);
+  void handleTare(void);
+  void handleResetScale(void);
+  void handleEtalon(void);
+  void handleStopMesure(void);
+  void handleStartMesure(void);
   bool handleFileRead(String path);
+  void handleGetSettings(void);
+  void handleSetSettings(void);
+  void handleFactory(void);
   void handleNotFound(void);
+  void handleReboot(void);
 
 #endif

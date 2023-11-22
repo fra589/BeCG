@@ -33,9 +33,9 @@ HX711 hx711_ba;
 HX711 hx711_bf;
 // WiFi
 char cli_ssid[MAX_SSID_LEN] = DEFAULT_CLI_SSID;
-char cli_pwd[MAX_PWD_LEN]  = DEFAULT_CLI_PWD;
+char cli_pwd[MAX_PWD_LEN]   = DEFAULT_CLI_PWD;
 char ap_ssid[MAX_SSID_LEN]  = DEFAULT_AP_SSID;
-char ap_pwd[MAX_PWD_LEN]   = DEFAULT_AP_PWD;
+char ap_pwd[MAX_PWD_LEN]    = DEFAULT_AP_PWD;
 // mDNS
 const char *myHostname = APP_NAME;
 // DNS server
@@ -79,7 +79,14 @@ void setup() {
   char charTmp;
   unsigned long debut;
   char buffNameVersion[NAME_VERSION_LEN] = { 0 };
+  bool update_cpu_freq = false;
+  // Try pushing frequency to 160MHz.
+  update_cpu_freq = system_update_cpu_freq(SYS_CPU_160MHZ);
 
+  #ifdef DEBUG
+    int cpuFreq;
+    cpuFreq = ESP.getCpuFreqMHz();
+  #endif
   #if defined(DEBUG) || defined(DEBUG2) || defined(DEBUG_WEB) || defined(DEBUG_WEB_VALUE)
     // Init port série pour debug
     Serial.begin(115200);
@@ -95,7 +102,7 @@ void setup() {
   // Prépare la chaine de version qui permet de vérifier les données de l'EEPROM
   strcpy(nameVersion, APP_NAME_VERSION);
   #ifdef DEBUG
-    Serial.printf("\nStarting %s...\n\n", nameVersion);
+    Serial.printf("\nStarting %s on ESP8266@%dMHz (update_cpu_freq = %s)...\n\n", nameVersion, cpuFreq, update_cpu_freq?"true":"false");
     Serial.flush();
   #endif
 
@@ -191,15 +198,9 @@ void setup() {
   hx711_bf.set_scale();
   hx711_bf.tare();
 
+  delay(250);
+
   // Etalonnage des Balance :
-  // Valeur des capteurs utilisés pour le dev avec un gain de 128 :
-  // Etalonnage terminé, scale_ba = 727.656006, scale_bf = 803.713989
-  ////hx711_ba.set_scale(722.898010);
-  ////hx711_bf.set_scale(797.702026);
-  // avec un gain de 64 :
-  // Etalonnage terminé, scale_ba = 363.738007, scale_bf = 401.615997
-  //hx711_ba.set_scale(363.738007);
-  //hx711_bf.set_scale(401.615997);
   if (scaleBA != 0.0) {
 	  hx711_ba.set_scale(scaleBA);
   } else {
@@ -211,7 +212,13 @@ void setup() {
     hx711_ba.set_scale(DEFAULT_SCALE_BA);
   }
 
-  // Connection à un Acces Point si SSID défini
+  delay(250);
+
+  //--------------------------------------------------------------------
+  // Parametrage du WiFi
+  //--------------------------------------------------------------------
+  WiFi.setAutoConnect(false);
+  // Connexion à un Acces Point si SSID défini
   if (cli_ssid[0] != '\0') {
     #ifdef DEBUG
       Serial.println("");
@@ -221,7 +228,7 @@ void setup() {
     debut = millis();
     WiFi.begin(cli_ssid, cli_pwd);
     while (WiFi.status() != WL_CONNECTED) {
-      delay(250);
+      delay(500);
       #ifdef DEBUG
         Serial.print(".");
         Serial.flush();
@@ -236,6 +243,7 @@ void setup() {
           Serial.print("IP = ");
           Serial.println(WiFi.localIP());
       #endif
+      WiFi.setAutoReconnect(true);
       //Start mDNS with APP_NAME
       if (MDNS.begin(myHostname, WiFi.localIP())) {
         ;
@@ -252,6 +260,23 @@ void setup() {
       ;
       #ifdef DEBUG
         Serial.println("FAIL");
+        switch (WiFi.status()) {
+          case WL_IDLE_STATUS:
+            Serial.println("Erreur : Wi-Fi is in process of changing between statuses");
+          break;
+          case WL_NO_SSID_AVAIL:
+            Serial.println("Erreur : SSID cannot be reached");
+          break;
+          case WL_CONNECT_FAILED:
+            Serial.println("Erreur : Connexion failed");
+          break;
+          case WL_WRONG_PASSWORD:
+            Serial.println("Erreur : Password is incorrect");
+          break;
+          case WL_DISCONNECTED:
+            Serial.println("Erreur : Module is not configured in station mode");
+          break;
+        }
       #endif
     } 
   }
@@ -308,6 +333,8 @@ void setup() {
   server.on("/reboot", handleReboot);
   server.on("/getsettings", handleGetSettings);
   server.on("/setsettings", handleSetSettings);
+  server.on("/wificonnect", handleWifiConnect);
+  server.on("/deconnexion", handleDeconnection);
   server.on("/resetfactory", handleFactory);
   
   server.onNotFound(handleNotFound);

@@ -45,8 +45,8 @@
   #define ORG_NAME            "fra589"
   #define APP_NAME            "BeCG"
   #define APP_VERSION_MAJOR   "0"
-  #define APP_VERSION_MINOR   "6"
-  #define APP_VERSION_DATE    "20231120"
+  #define APP_VERSION_MINOR   "8"
+  #define APP_VERSION_DATE    "20231122"
   #define APP_VERSION_STRING  "v" APP_VERSION_MAJOR "." APP_VERSION_MINOR "." APP_VERSION_DATE
   #define APP_NAME_VERSION    APP_NAME " - " APP_VERSION_STRING "\0"
   #define COPYRIGHT           "G.Bri\x8Are 2023-2023"
@@ -96,8 +96,8 @@
   #define APPUIS_LONG       2 // 2 secondes
 
   // Valeurs des paramètres par défauts
-  #define DEFAULT_CLI_SSID "DomoPassaduy"       // SSID client (la balance se connecte si défini)
-  #define DEFAULT_CLI_PWD  "C'est1secret"       // WPA-PSK/WPA2-PSK client
+  #define DEFAULT_CLI_SSID ""       // SSID client (la balance se connecte si défini)
+  #define DEFAULT_CLI_PWD  ""       // WPA-PSK/WPA2-PSK client
   #define DEFAULT_AP_SSID  "BeCG_"  // SSID de l'AP balance
   #define DEFAULT_AP_PWD   ""       // WPA-PSK/WPA2-PSK AP
 

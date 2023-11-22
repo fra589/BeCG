@@ -37,5 +37,6 @@
 
   bool isIp(String str);
   String IPtoString(IPAddress ip);
+  String formateCP437(String utf8);
 
 #endif // tools_h

@@ -23,9 +23,10 @@
   font-family: "Helvetica", "Arial", sans-serif;
 }
 body {
-  margin: 5px;
-  background-color: #d0ffe5;
+  margin: 5px auto;
+  width: 100%;
   min-width: 640px;
+  background-color: #d0ffe5;
   text-align: center;
 }
 .alignement-droit {
@@ -159,4 +160,50 @@ h1 {
   width: 13em;
   display: inline-block;
 }
-
+#reseauActuel  {
+  text-align: left;
+}
+#reseauActuel input {
+  margin-bottom: 3px;
+  text-align: center;
+}
+#reseauActuel label {
+  margin-left: 18px;
+  width: 13em;
+  display: inline-block;
+}
+.netTables {
+  border-spacing: 2px;
+}
+.trlink {
+  cursor: pointer;
+  background-color: skyblue;
+  height: 40px;
+}
+.centreVertical {
+  vertical-align: bottom;
+}
+#span_deconnexion {
+  float: right;
+  margin-right: 10px;
+}
+.dlgPwdContenu {
+  margin: 15px;
+  height: 70%;
+  /*background-color: lightgreen;*/
+  font-size: 12px;
+}
+.dlgPwdContenu label {
+  display: inline-block;
+  width: 17em;
+  text-align: left;
+  margin-top: 15px;
+  margin-bottom: 10px;
+}
+.dlgPwdContenu input {
+  width: 15em;
+}
+#ssid_input {
+  margin-top: 20px;
+  text-align: center;
+}

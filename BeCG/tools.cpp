@@ -270,3 +270,45 @@ String IPtoString(IPAddress ip) {
   res += String((ip >> (8 * 3)) & 0xFF);
   return res;
 }
+
+// Formate une chaine de caractère utf8 et caractères 
+// d'échappement pour affichage sur SSD1306 en CP437
+String formateCP437(String utf8) {
+  String tmpString = "";
+  String tmpChar = "";
+  int i;
+  int len;
+  
+  len = utf8.length();
+  for (i=0; i<len; i++) {
+    tmpChar = utf8[i];
+    if (tmpChar == "à") {
+      tmpString += '\x85';
+    } else if (tmpChar == "é") {
+      tmpString += '\x82';
+    } else if (tmpChar == "ê") {
+      tmpString += '\x88';
+    } else if (tmpChar == "ë") {
+      tmpString += '\x89';
+    } else if (tmpChar == "è") {
+      tmpString += '\x8A';
+    } else if (tmpChar == "ç") {
+      tmpString += '\x87';
+    } else if (tmpChar == "\\") {
+      i++;
+      tmpChar = utf8[i];
+      if (tmpChar == "n") {
+        tmpString += '\n';
+      } else if (tmpChar == "t") {
+        tmpString += '\t';
+      } else if (tmpChar == "\\") {
+        tmpString += '\\';
+      }
+    } else {
+      tmpString += tmpChar;
+    }
+  }
+  
+  return tmpString;
+  
+}

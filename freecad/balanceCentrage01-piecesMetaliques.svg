@@ -5,7 +5,7 @@
    height="210mm"
    version="1.2"
    id="svg1348"
-   sodipodi:docname="balanceCentrage01-piècesMétaliques.svg"
+   sodipodi:docname="balanceCentrage01-piecesMetaliques.svg"
    inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -88,6 +88,13 @@
      inkscape:label="TechDraw"
      id="Page"
      inkscape:groupmode="layer">
+    <rect
+       style="opacity:0.998;fill:#feffff;fill-opacity:1;stroke:#c5c5c5;stroke-width:2.00001;stroke-linecap:round"
+       id="rect1092"
+       width="2968"
+       height="2098"
+       x="1.000005"
+       y="1.000005" />
     <g
        style="stroke: none;"
        id="A4_Landscape_ISO7200TD.svg"

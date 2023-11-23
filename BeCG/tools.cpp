@@ -279,6 +279,10 @@ String formateCP437(String utf8) {
   int i;
   int len;
   
+  /*
+  tmpString = utf8.replace("à", "\x85").replace("é", "\x82").replace("è", "\x8A");
+  */
+  
   len = utf8.length();
   for (i=0; i<len; i++) {
     tmpChar = utf8[i];
@@ -308,7 +312,7 @@ String formateCP437(String utf8) {
       tmpString += tmpChar;
     }
   }
-  
+
   return tmpString;
   
 }

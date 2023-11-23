@@ -35,6 +35,7 @@
   void clearDisplay(void);
   void afficheSplash(void);
   void afficheMessage(const char *message);
+  int  afficheDigit(int digit);
   void afficheMasse_BA_BF(float masseBA, float MasseBF);
   void afficheMasseTotale(float masseTotale);
   void afficheCG(float positionCG);

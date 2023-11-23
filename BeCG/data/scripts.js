@@ -458,7 +458,7 @@ async function etalonnage() {
   document.getElementById("dlgContenu0").innerHTML = msg;
   // Bloque les mesures sur la balance
   XMLHttpRequest_get("stopmesure");
-  XMLHttpRequest_get("affichage?text=Etalonnage réseau\nen cours...");
+  XMLHttpRequest_get(encodeURI("affichage?text=Etalonnage réseau\nen cours..."));
   
   // Attente click sur bouton suite
   while (!suiteOK) {

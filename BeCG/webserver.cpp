@@ -346,6 +346,7 @@ void handleGetNetworks(void) {
 
 void handleAffichage(void) {
   String XML;
+  String tmpString = "";
   int i;
 
   String uri = ESP8266WebServer::urlDecode(server.uri());  // required to read paths with blanks
@@ -369,7 +370,12 @@ void handleAffichage(void) {
       #ifdef DEBUG_WEB
         Serial.printf("  handleAffichage() - envoi du texte sur l'écran\n");
       #endif
-      afficheMessage(formateCP437(server.arg(i).c_str()).c_str());
+      //afficheMessage(formateCP437(server.arg(i).c_str()).c_str());
+      tmpString = server.arg(i);
+      tmpString.replace("à", "\x85");
+      tmpString.replace("é", "\x82");
+      tmpString.replace("è", "\x8A");
+      afficheMessage(tmpString.c_str());
     } else if (strncasecmp(server.argName(i).c_str(), "reset", (size_t)5) == 0) {
       #ifdef DEBUG_WEB
         Serial.printf("  handleAffichage() - Reset écran\n");

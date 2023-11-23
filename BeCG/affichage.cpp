@@ -72,10 +72,31 @@ void clearDisplay(void) {
 void afficheMessage(const char *message) {
 
   clearDisplay();
-  display.setTextSize(1,2);
-  display.setCursor(0,0);
+  display.setTextSize(1, 2);
+  display.setCursor(0, 0);
   display.print(message);
   display.display();
+
+}
+
+
+int afficheDigit(int digit) {
+  int x, y;
+  
+  if ((digit >= 0) && (digit <= 9)) {
+    clearDisplay();
+    // Taille de police x6 => 36x48
+    display.setTextSize(6, 6);
+    x = (SCREEN_WIDTH - 36) / 2;
+    y = (SCREEN_HEIGHT - 48) / 2;
+    // Centrage du digit
+    display.setCursor(x, y);
+    display.print(digit);
+    display.display();
+    return digit;
+  } else {
+    return -1;
+  }
 
 }
 

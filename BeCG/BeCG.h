@@ -37,9 +37,9 @@
   #include "webserver.h"
 
   // Pour debug sur port série
-  #define DEBUG
+  //#define DEBUG
   //#define DEBUG2          // Pour debugs dans la boucle...
-  #define DEBUG_WEB       // debug des interractions web
+  //#define DEBUG_WEB       // debug des interractions web
   //#define DEBUG_WEB_VALUE // debug des appels de valeurs web
 
   #define ORG_NAME            "fra589"

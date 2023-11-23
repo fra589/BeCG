@@ -355,7 +355,9 @@ void loop() {
   unsigned long now = 0;
   float masse_ba = 0.0;
   float masse_bf = 0.0;
-
+  int digitAffiche = -1;
+  int digit = 0;
+  
   //DNS
   dnsServer.processNextRequest();
   if (WiFi.status() == WL_CONNECTED) {
@@ -369,6 +371,20 @@ void loop() {
     if (etat_bouton == BOUTON_ON) {
       debut = millis();
       do {
+        // Affiche les secondes d'appuis sur l'écran
+        if (digitAffiche < 0) {
+          digitAffiche = afficheDigit(0);
+        } else {
+          digit = (int)((millis() - debut)/1000);
+          if (digit > 9) {
+            // Un appuis de plus de 10 secondes fait rebooter la balance
+            ESP.restart();
+          }
+          // met à jour l'affichage du digit à chaque seconde
+          if (digit != digitAffiche) {
+            digitAffiche = afficheDigit(digit);
+          }
+        }
         etat_bouton = digitalRead(PIN_BOUTON);
         delay(1);
         // https://forum.arduino.cc/t/yield-utilite-fonctionnement/883558

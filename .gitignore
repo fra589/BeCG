@@ -3,6 +3,7 @@ no_git
 *.zip
 *.o
 *.bin
+*.FCStd1
 build
 builds
 ssd1306-1.8.3

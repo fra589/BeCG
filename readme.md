@@ -22,5 +22,6 @@ La précision de mesure estimée de la masse est de l'ordre de ±0.2g, celle du 
 TODO : 
 - Rédiger la documentation dans le wiki : https://github.com/fra589/BeCG/wiki,
 - intégrer dans l'application web les calculs de lests,
+- Version internationnale [Français, English, ...)
 - ... selon les idées qui remonteront ...
 ---

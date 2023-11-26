@@ -26,6 +26,8 @@
   extern bool tare_en_cours;
   extern bool etalonnage_en_cours;
 
+  void getEepromStartupData(void);
+  void balancesInit(void);
   void tare(void);
   void resetScale(void);
   float etalon(String uri);

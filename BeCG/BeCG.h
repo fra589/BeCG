@@ -22,6 +22,8 @@
 #ifndef BeCG_h
   #define BeCG_h
 
+  #include <stdlib.h>
+  #include <Adafruit_SSD1306.h>
   #include <EEPROM.h>
   #include <HX711.h>
   #include <ESP8266WiFi.h>
@@ -35,6 +37,7 @@
   #include "affichage.h"
   #include "tools.h"
   #include "webserver.h"
+  #include "becgwifi.h"
 
   // Pour debug sur port série
   #define DEBUG
@@ -108,8 +111,13 @@
   extern char cli_pwd[MAX_PWD_LEN];
   extern char ap_ssid[MAX_SSID_LEN];
   extern char ap_pwd[MAX_PWD_LEN];
+  
   // Web server
   extern ESP8266WebServer server;
+  
+  // DNS server
+  extern DNSServer dnsServer;
+  
   // hostname pour mDNS. devrait fonctionner au moins avec windows :
   // http://BeCG.local
   extern const char *myHostname;

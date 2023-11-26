@@ -43,9 +43,6 @@ const byte DNS_PORT = 53;
 DNSServer dnsServer;
 // Web server
 ESP8266WebServer server(80);
-// Soft AP network parameters
-IPAddress apIP(10, 10, 10, 10);
-IPAddress netMsk(255, 255, 255, 0);
 // Masses et Centre de Gravité
 float valeurMoy_ba = 0.0;
 float valeurMoy_bf = 0.0;
@@ -76,17 +73,10 @@ TrivialKalmanFilter<float> filter_ba(DT_COVARIANCE_RK, DT_COVARIANCE_QK);
 TrivialKalmanFilter<float> filter_bf(DT_COVARIANCE_RK, DT_COVARIANCE_QK);
 
 void setup() {
-  char charTmp;
-  unsigned long debut;
-  char buffNameVersion[NAME_VERSION_LEN] = { 0 };
   bool update_cpu_freq = false;
   // Try pushing frequency to 160MHz.
   update_cpu_freq = system_update_cpu_freq(SYS_CPU_160MHZ);
 
-  #ifdef DEBUG
-    int cpuFreq;
-    cpuFreq = ESP.getCpuFreqMHz();
-  #endif
   #if defined(DEBUG) || defined(DEBUG2) || defined(DEBUG_WEB) || defined(DEBUG_WEB_VALUE)
     // Init port série pour debug
     Serial.begin(115200);
@@ -95,258 +85,32 @@ void setup() {
     Serial.flush();
   #endif
 
-  // Init affichage
-  affichage_init();
-  afficheSplash();
-
-  // Prépare la chaine de version qui permet de vérifier les données de l'EEPROM
-  strcpy(nameVersion, APP_NAME_VERSION);
   #ifdef DEBUG
-    Serial.printf("\nStarting %s on ESP8266@%dMHz (update_cpu_freq = %s)...\n\n", nameVersion, cpuFreq, update_cpu_freq?"true":"false");
+    int cpuFreq;
+    cpuFreq = ESP.getCpuFreqMHz();
+    Serial.printf("\nStarting %s on ESP8266@%dMHz (update_cpu_freq = %s)...\n\n", APP_NAME_VERSION, cpuFreq, update_cpu_freq?"true":"false");
     Serial.flush();
   #endif
 
   // Hardware init
   pinMode(PIN_BOUTON, INPUT_PULLUP);
 
-  // Récupération des paramètres dans la Flash ou de leur valeur par défaut
-  EEPROM.begin(EEPROM_LENGTH);
-  charTmp = char(EEPROM.read(ADDR_NAME_VERSION));
-  if (charTmp != 0xFF) {
-    buffNameVersion[0] = charTmp;
-    for (int i=1; i<NAME_VERSION_LEN; i++) {
-      buffNameVersion[i] = char(EEPROM.read(ADDR_NAME_VERSION + i));
-    }
-    #ifdef DEBUG
-      Serial.printf("EEPROM nameVersion..... = %s\n", buffNameVersion);
-    #endif
-    if (strncmp(nameVersion, buffNameVersion, NAME_VERSION_LEN) != 0) {
-      // Les données sauvegardées dans l'EEPROM ne correspondent pas à 
-      // la version en cours, il faut recharger les paramètres par défaut
-      #ifdef DEBUG
-        Serial.printf("Version incorrecte des données EEPROM [%s] != [%s]\n", buffNameVersion, nameVersion);
-      #endif
-      resetFactory();
-    }
-  } else {
-    // L'EEPROM est vide !
-    #ifdef DEBUG
-      Serial.printf("l'EEPROM est vide, chargement des données d'usine.\n", buffNameVersion, nameVersion);
-    #endif
-    resetFactory();
-  }
+  // Init affichage
+  affichage_init();
+  afficheSplash();
+
+  // Récupération des paramètres EEPROM
+  getEepromStartupData();
   
-  EEPROM.get(ADDR_SCALE_BA, scaleBA);  if (scaleBA != scaleBA) scaleBA = DEFAULT_SCALE_BA;
-  EEPROM.get(ADDR_SCALE_BF, scaleBF);  if (scaleBF != scaleBF) scaleBF = DEFAULT_SCALE_BF;
-  charTmp = char(EEPROM.read(ADDR_CLI_SSID));
-  if (charTmp != 0xFF) {
-    cli_ssid[0] = charTmp;
-    for (int i=1; i<MAX_SSID_LEN; i++) {
-      cli_ssid[i] = char(EEPROM.read(ADDR_CLI_SSID + i));
-    }
-  }
-  charTmp = char(EEPROM.read(ADDR_CLI_PWD));
-  if (charTmp != 0xFF) {
-    cli_pwd[0] = charTmp;
-    for (int i=1; i<MAX_PWD_LEN; i++) {
-      cli_pwd[i] = char(EEPROM.read(ADDR_CLI_PWD + i));
-    }
-  }
-  charTmp = char(EEPROM.read(ADDR_AP_SSID));
-  if (charTmp != 0xFF) {
-    ap_ssid[0] = charTmp;
-    for (int i=1; i<MAX_SSID_LEN; i++) {
-      ap_ssid[i] = char(EEPROM.read(ADDR_AP_SSID + i));
-    }
-  } else {
-    String SSID_MAC = String(DEFAULT_AP_SSID + WiFi.softAPmacAddress().substring(9));
-    SSID_MAC.toCharArray(ap_ssid, MAX_SSID_LEN);
-  }
-  charTmp = char(EEPROM.read(ADDR_AP_PWD));
-  if (charTmp != 0xFF) {
-    ap_pwd[0] = charTmp;
-    for (int i=1; i<MAX_PWD_LEN; i++) {
-      ap_pwd[i] = char(EEPROM.read(ADDR_AP_PWD + i));
-    }
-  }
-  EEPROM.get(ADDR_ENTRAXE, entraxe);  if (entraxe != entraxe) entraxe = DEFAULT_ENTAXE;
-  EEPROM.get(ADDR_PAF_BA, pafBA);  if (pafBA != pafBA) pafBA = DEFAULT_PAF_BA;
-  EEPROM.get(ADDR_MASSE_ETALON, masseEtalon);  if (masseEtalon != masseEtalon) masseEtalon = DEFAULT_MASSE_ETALON;
+  // Initialisation du WiFi
+  wifiApInit();
+  wifiClientInit();
 
-  #ifdef DEBUG
-    Serial.printf("nameVersion............ = %s\n", nameVersion);
-    Serial.printf("scaleBA................ = %f\n", scaleBA);
-    Serial.printf("scaleBF................ = %f\n", scaleBF);
-    Serial.printf("pafBA.................. = %f\n", pafBA);
-    Serial.printf("entraxe................ = %f\n", entraxe);
-    Serial.printf("masseEtalon............ = %d\n", masseEtalon);
-    Serial.printf("cli_ssid............... = %s\n", cli_ssid);
-    Serial.printf("cli_pwd................ = %s\n", cli_pwd);
-    Serial.printf("ap_ssid................ = %s\n", ap_ssid);
-    Serial.printf("ap_pwd................. = %s\n\n", ap_pwd);
-  #endif
+  // Démarrage du serveur web
+  webServerInit();
 
-  // Init des balances
-  #ifdef DEBUG
-    Serial.println("HX711 begin...");
-  #endif
-  hx711_ba.begin(LOADCELL_BA_DOUT_PIN, LOADCELL_BA_SCK_PIN, 64);
-  hx711_bf.begin(LOADCELL_BF_DOUT_PIN, LOADCELL_BF_SCK_PIN, 64);
-
-  if ((hx711_ba.wait_ready_timeout(500, 50)) && (hx711_bf.wait_ready_timeout(500, 50))) {
-    // Initialise la tare (zéro) et l'échelle des balance
-    hx711_ba.set_scale();
-    hx711_ba.tare();
-    hx711_bf.set_scale();
-    hx711_bf.tare();
-    delay(250);
-
-    // Etalonnage des Balance :
-    if (scaleBA != 0.0) {
-      hx711_ba.set_scale(scaleBA);
-    } else {
-      hx711_ba.set_scale(DEFAULT_SCALE_BA);
-    }
-    if (scaleBF != 0.0) {
-      hx711_bf.set_scale(scaleBF);
-    } else {
-      hx711_ba.set_scale(DEFAULT_SCALE_BA);
-    }
-    delay(250);
-  } else {
-    ;
-    #ifdef DEBUG
-      Serial.println("Pas de réponse du (des) module(s) HX711.");
-    #endif
-  }
-
-  //--------------------------------------------------------------------
-  // Parametrage du WiFi
-  //--------------------------------------------------------------------
-  WiFi.setAutoConnect(false);
-  // Connexion à un Acces Point si SSID défini
-  if (cli_ssid[0] != '\0') {
-    #ifdef DEBUG
-      Serial.println("");
-      Serial.print("Connexion à "); Serial.print(cli_ssid);
-      Serial.flush();
-    #endif
-    debut = millis();
-    WiFi.begin(cli_ssid, cli_pwd);
-    while (WiFi.status() != WL_CONNECTED) {
-      delay(500);
-      #ifdef DEBUG
-        Serial.print(".");
-        Serial.flush();
-      #endif
-      if (millis() - debut > 10000) {
-        break; // Timeout = 10 secondes
-      }
-    }
-    if(WiFi.status() == WL_CONNECTED) {
-      #ifdef DEBUG
-          Serial.println("OK");
-          Serial.print("IP = ");
-          Serial.println(WiFi.localIP());
-      #endif
-      WiFi.setAutoReconnect(true);
-      //Start mDNS with APP_NAME
-      if (MDNS.begin(myHostname, WiFi.localIP())) {
-        ;
-        #ifdef DEBUG
-          Serial.println("MDNS started");
-        #endif
-      } else {
-        ;
-        #ifdef DEBUG
-          Serial.println("MDNS failed");
-        #endif
-      }
-    } else {
-      ;
-      #ifdef DEBUG
-        Serial.println("FAIL");
-        switch (WiFi.status()) {
-          case WL_IDLE_STATUS:
-            Serial.println("Erreur : Wi-Fi is in process of changing between statuses");
-          break;
-          case WL_NO_SSID_AVAIL:
-            Serial.println("Erreur : SSID cannot be reached");
-          break;
-          case WL_CONNECT_FAILED:
-            Serial.println("Erreur : Connexion failed");
-          break;
-          case WL_WRONG_PASSWORD:
-            Serial.println("Erreur : Password is incorrect");
-          break;
-          case WL_DISCONNECTED:
-            Serial.println("Erreur : Module is not configured in station mode");
-          break;
-        }
-      #endif
-    } 
-  }
-
-  // Ouverture access point de la balance
-  #ifdef DEBUG
-    Serial.print("\nConfiguring access point, SSID = ");
-    Serial.print(ap_ssid);
-    Serial.println("...");
-    Serial.flush();
-  #endif
-  WiFi.softAPConfig(apIP, apIP, netMsk);
-  if (ap_pwd[0] == '\0') {
-    WiFi.softAP(ap_ssid); // AP ouverte si pas de mot de passe
-  } else {
-    WiFi.softAP(ap_ssid, ap_pwd);
-  }
-  delay(500); // Without delay I've seen the IP address blank
-  #ifdef DEBUG
-    Serial.print("AP IP address: ");
-    Serial.println(WiFi.softAPIP());
-    Serial.flush();
-  #endif
-
-  // Setup DNS server pour redirection de tous les domaines 
-  // sur l'IP de la balance
-  dnsServer.setErrorReplyCode(DNSReplyCode::NoError);
-  dnsServer.start(DNS_PORT, "*", apIP);
-
-  // Montage du système de fichier ou sont stockés les éléments web
-  if (!LittleFS.begin()) {
-    ;
-    #ifdef DEBUG
-      Serial.println("Erreur lors du montage du système de fichier LittleFS");
-      Serial.flush();
-    #endif    
-  }
-
-  // Setup web pages
-  server.enableCORS(true);
-  server.on("/", handleRoot);
-  server.on(ROOT_FILE, handleRoot); // index.html
-  server.on("/getvalues", handleGetValues);
-  server.on("/getversion", handleGetVersion);
-  server.on("/getwifi", handleGetWifi);
-  server.on("/getnetworks", handleGetNetworks);
-  server.on("/affichage", handleAffichage);
-  server.on("/tare", handleTare);
-  server.on("/resetscale", handleResetScale);
-  server.on("/etalonba", handleEtalon);
-  server.on("/etalonbf", handleEtalon);
-  server.on("/stopmesure", handleStopMesure);
-  server.on("/startmesure", handleStartMesure);
-  server.on("/reboot", handleReboot);
-  server.on("/getsettings", handleGetSettings);
-  server.on("/setsettings", handleSetSettings);
-  server.on("/wificonnect", handleWifiConnect);
-  server.on("/deconnexion", handleDeconnection);
-  server.on("/resetfactory", handleFactory);
-  
-  server.onNotFound(handleNotFound);
-  server.begin(); // Start web server
-
-  delay(1000);
+  // Initialisation des balances
+  balancesInit();
 
   // Effacement splash et affichage du pied de page
   clearDisplay();

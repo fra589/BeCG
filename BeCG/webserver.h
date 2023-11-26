@@ -22,6 +22,7 @@
 #ifndef webserver_h
   #define webserver_h
 
+  void webServerInit(void);
   bool captivePortal(void);
   void handleRoot(void);
   void handleGetValues(void);

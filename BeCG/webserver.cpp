@@ -20,7 +20,50 @@
 /****************************************************************************/
 
 #include "BeCG.h"
-#include <stdlib.h>
+
+void webServerInit(void) {
+  // Montage du système de fichier ou sont stockés les éléments web
+  if (!LittleFS.begin()) {
+    ;
+    #ifdef DEBUG
+      Serial.println("Erreur lors du montage du système de fichier LittleFS");
+      Serial.flush();
+    #endif    
+  }
+
+  // Setup web pages
+  server.enableCORS(true);
+  server.on("/", handleRoot);
+  server.on(ROOT_FILE, handleRoot); // index.html
+  server.on("/getvalues", handleGetValues);
+  server.on("/getversion", handleGetVersion);
+  server.on("/getwifi", handleGetWifi);
+  server.on("/getnetworks", handleGetNetworks);
+  server.on("/affichage", handleAffichage);
+  server.on("/tare", handleTare);
+  server.on("/resetscale", handleResetScale);
+  server.on("/etalonba", handleEtalon);
+  server.on("/etalonbf", handleEtalon);
+  server.on("/stopmesure", handleStopMesure);
+  server.on("/startmesure", handleStartMesure);
+  server.on("/reboot", handleReboot);
+  server.on("/getsettings", handleGetSettings);
+  server.on("/setsettings", handleSetSettings);
+  server.on("/wificonnect", handleWifiConnect);
+  server.on("/deconnexion", handleDeconnection);
+  server.on("/resetfactory", handleFactory);
+  
+  server.onNotFound(handleNotFound);
+  server.begin(); // Start web server
+
+  delay(1000);
+
+  #ifdef DEBUG
+    Serial.println("Serveur web démarré.");
+    Serial.flush();
+  #endif    
+
+}
 
 // Redirection vers le portail captif en cas de requette vers un autre domaine
 // retourne true dans ce cas pour éviter que la page ne renvoie plusieurs fois

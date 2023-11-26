@@ -193,26 +193,32 @@ void setup() {
   hx711_ba.begin(LOADCELL_BA_DOUT_PIN, LOADCELL_BA_SCK_PIN, 64);
   hx711_bf.begin(LOADCELL_BF_DOUT_PIN, LOADCELL_BF_SCK_PIN, 64);
 
-  hx711_ba.set_scale();
-  hx711_ba.tare();
-  hx711_bf.set_scale();
-  hx711_bf.tare();
+  if ((hx711_ba.wait_ready_timeout(500, 50)) && (hx711_bf.wait_ready_timeout(500, 50))) {
+    // Initialise la tare (zéro) et l'échelle des balance
+    hx711_ba.set_scale();
+    hx711_ba.tare();
+    hx711_bf.set_scale();
+    hx711_bf.tare();
+    delay(250);
 
-  delay(250);
-
-  // Etalonnage des Balance :
-  if (scaleBA != 0.0) {
-	  hx711_ba.set_scale(scaleBA);
+    // Etalonnage des Balance :
+    if (scaleBA != 0.0) {
+      hx711_ba.set_scale(scaleBA);
+    } else {
+      hx711_ba.set_scale(DEFAULT_SCALE_BA);
+    }
+    if (scaleBF != 0.0) {
+      hx711_bf.set_scale(scaleBF);
+    } else {
+      hx711_ba.set_scale(DEFAULT_SCALE_BA);
+    }
+    delay(250);
   } else {
-    hx711_ba.set_scale(DEFAULT_SCALE_BA);
+    ;
+    #ifdef DEBUG
+      Serial.println("Pas de réponse du (des) module(s) HX711.");
+    #endif
   }
-  if (scaleBF != 0.0) {
-    hx711_bf.set_scale(scaleBF);
-  } else {
-    hx711_ba.set_scale(DEFAULT_SCALE_BA);
-  }
-
-  delay(250);
 
   //--------------------------------------------------------------------
   // Parametrage du WiFi

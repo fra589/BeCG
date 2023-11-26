@@ -25,4 +25,10 @@
   void wifiApInit(void);
   void wifiClientInit(void);
 
+  #ifdef DEBUG
+    void onStationConnected(const WiFiEventSoftAPModeStationConnected& evt);
+    void onStationDisconnected(const WiFiEventSoftAPModeStationDisconnected& evt);
+    void onProbeRequestPrint(const WiFiEventSoftAPModeProbeRequestReceived& evt);
+  #endif
+
 #endif // becgwifi_h

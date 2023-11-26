@@ -40,5 +40,6 @@
   bool isIp(String str);
   String IPtoString(IPAddress ip);
   String formateCP437(String utf8);
+  String macToString(const unsigned char* mac);
 
 #endif // tools_h

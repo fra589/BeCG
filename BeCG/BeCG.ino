@@ -135,8 +135,9 @@ void loop() {
   }
   //HTTP
   server.handleClient();
+
+  // Etat du bouton de tarrage
   if (!disableBouton) {
-    // Etat du bouton de tarrage
     int etat_bouton = digitalRead(PIN_BOUTON);
     if (etat_bouton == BOUTON_ON) {
       debut = millis();

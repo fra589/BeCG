@@ -370,6 +370,14 @@ function XMLHttpResult(requette, xml, text) {
       } else {
         alert("Erreur de connexion : \n" + result);
       }
+    } else if (requette == "deconnexion") {
+      result = xml.getElementsByTagName("result")[0].childNodes[0].nodeValue;
+      if (result == "OK") {
+        alert("Wifi client déconnecté.");
+        location.reload();
+      } else {
+        alert("Erreur déconnexion : \n" + result);
+      }
     }
   }
   if (requette == "getvalues") {

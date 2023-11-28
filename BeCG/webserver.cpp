@@ -52,10 +52,14 @@ void webServerInit(void) {
   server.on("/wificonnect", handleWifiConnect);
   server.on("/deconnexion", handleDeconnection);
   server.on("/resetfactory", handleFactory);
-  
+  server.on("/update", HTTP_GET, handleUpdate);
   server.onNotFound(handleNotFound);
+  
+  httpUpdater.setup(&server); // Pour mise a jour par le réseau
   server.begin(); // Start web server
 
+  MDNS.addService("http", "tcp", 80);
+  
   delay(1000);
 
   #ifdef DEBUG
@@ -842,7 +846,7 @@ void handleDeconnection(void) {
   int i;
   
   #ifdef DEBUG_WEB
-    Serial.printf("Entrée dans handleFactory() --- %d\n", millis()/1000);
+    Serial.printf("Entrée dans handleDeconnection() --- %d\n", millis()/1000);
   #endif
 
   // Deconnexion du réseau
@@ -916,4 +920,11 @@ void handleFactory(void) {
   server.sendHeader("Access-Control-Allow-Origin", "*");
   server.send(200,"text/xml",XML);
 
+}
+
+void handleUpdate(void) {
+  #ifdef DEBUG_WEB
+    Serial.println("Entrée dans handleUpdate()");
+  #endif
+  handleFileRead("/update.html");
 }

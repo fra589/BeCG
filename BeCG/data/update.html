@@ -4,7 +4,7 @@
 /*                                                                          */
 /* Copyright (C) 2023-2023 Gauthier Brière (gauthier.briere "at" gmail.com) */
 /*                                                                          */
-/* This file: settings.html is part of BeCG                                 */
+/* This file: update.html is part of BeCG                                   */
 /*                                                                          */
 /* BeCG is free software: you can redistribute it and/or modify it          */
 /* under the terms of the GNU General Public License as published by        */
@@ -28,10 +28,11 @@
     <meta name="description" content="Balance électronique pour mesure du Centre de Gravité des modèles réduits d'avion.">
     <title>BeCG</title>
     <link rel="shortcut icon" type="image/png" href="favicon.svg" />
-    <link rel="stylesheet" media="screen" type="text/css" href="style.css"/>
-    <script type="text/javascript" src="scripts.js"></script>
+    <link rel="stylesheet" media="screen" type="text/css" href="update_style.css"/>
+    <script type="text/javascript" src="update_scripts.js"></script>
   </head>
-  <body onload="get_settings()">
+  <body onload="update_onload()">
+    <div id="overlay"></div>
 	  <table id="entete">
       <tbody>
         <tr>
@@ -55,54 +56,36 @@
         </tr>
       </tbody>
     </table>
-	  <div id="la_page">
-      <h2>Configuration de la balance</h2>
-      <div id="image_setting">
-          <img src="profilsetting.svg" />
+	  <div id="update_page">
+      <div class="tile-container">
+        <div class="title-image"></div>
+        <h1>BeCG - Mise à jour de la balance</h1>
       </div>
-      <p id="balance_config">
-        <label for="paf_ba">Porte à faux BA</label>
-        <input type="number" name="paf_ba" id="paf_ba" value="0.0" />
-        <br />
-        <label for="entraxe">Entraxe des appuis</label>
-        <input type="number" name="entraxe" id="entraxe" value="0.0" />
-        <br />
-        <label for="tare">Masse étalonnage</label>
-        <input type="text" name="tare" id="tare" pattern="\d*" oninput="this.value=this.value.replace(/[^0-9]/g,'');" value="0" />
-      </p>
-        <div style="float: left; margin-left: 18px;">
-          <a href="/update">Mettre à jour la balance</a>
-          <br /><a href="#" onclick="reboot()">Redémarrer la balance</a>
-        </div>
-      <!--------------------------------------------------------------------->
-      <!-- Boutons annuler / valider -->
-      <!--------------------------------------------------------------------->
-      <p class="alignement-droit">
-        <button id="bouton_recharger" title="Recharger les valeurs de la balance" onclick="get_settings()">
-          Recharger
-        </button>
-        &nbsp;
-        <button id="bouton_valider" title="Valider" onclick="XMLHttpRequest_post_settings()">
-          Valider
-        </button>
-      </p>
-      <hr />
-      <p>
-        BeCG AP SSID = <span id="ap_ssid">BeCG_XX:XX:XX</span>&nbsp;---&nbsp;IP = <span id="ap_ip">0.0.0.0</span><br />
-        BeCG client SSID = <span id="cli_ssid">vide</span>&nbsp;---&nbsp;IP = <span id="cli_ip">0.0.0.0</span>
-      </p>
-      <p>
-        <a href="netconfig.html">Configurer le réseau WiFi...</a>
-      </p>
-    </div>  <!--id="la_page" -->
-    <hr />
-	  <div id="pied_de_page">
-      <p>
-        BeCG <span id="version">v0.0.00000000</span> - Copyright © Gauthier Brière (<a href="https://github.com/fra589/BeCG">fra589</a>) - 2023
-      </p> <!--id="pied_de_page" -->
+      <div class="container">
+        <form enctype="multipart/form-data" class="form-container" id="upload_form" method="post">
+          <div id="switch-container">
+            <button class="button-o left selected" id="firmware-button" type="button">Firmware</button>
+            <button class="button-o right" id="filesystem-button" type="button">Données</button>
+          </div>
+          <input type="file" id="file1" name="firmware" accept=".bin,.bin.gz" class="input-file"><br>
+          <progress id="progressBar" max="100" value="0"></progress>
+          <div class="additional-info">
+            <h3 id="status">Téléchargement du Firmware</h3>
+            <p id="loaded_n_total"></p>
+          </div>
+          <hr/>
+          <button id="button-send" class="button-send" type="submit" disabled>Envoyer le fichier</button>
+        </form>
+      </div>
     </div>
     <!--------------------------------------------------------------------->
     <div id="dlgMask0" class="dlgMask noshow">
+      <div id="dlgEtalonnage" class="dialog">
+        <div id="dlgContenu0" class="dlgContenu">
+          <h2 class="reboot_title">Redémarrage de la balance</h2>
+          <h3 id="compte_a_rebour">20</h3>
+        </div>
+      </div>
       <div id="cadre_attente">
         <div id="attente0" class="attente noshow"></div>
       </div>

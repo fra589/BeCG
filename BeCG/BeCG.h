@@ -31,6 +31,7 @@
   #include <ESP8266WebServer.h>
   #include <DNSServer.h>
   #include <LittleFS.h>
+  #include <ESP8266HTTPUpdateServer.h>
 
   #include "TrivialKalmanFilter.h"
   #include "bitmaps.h"
@@ -114,6 +115,7 @@
   
   // Web server
   extern ESP8266WebServer server;
+  extern ESP8266HTTPUpdateServer httpUpdater;
   
   // DNS server
   extern DNSServer dnsServer;

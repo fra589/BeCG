@@ -43,6 +43,7 @@ const byte DNS_PORT = 53;
 DNSServer dnsServer;
 // Web server
 ESP8266WebServer server(80);
+ESP8266HTTPUpdateServer httpUpdater;
 // Masses et Centre de Gravité
 float valeurMoy_ba = 0.0;
 float valeurMoy_bf = 0.0;
@@ -75,7 +76,7 @@ TrivialKalmanFilter<float> filter_bf(DT_COVARIANCE_RK, DT_COVARIANCE_QK);
 void setup() {
   bool update_cpu_freq = false;
   // Try pushing frequency to 160MHz.
-  update_cpu_freq = system_update_cpu_freq(SYS_CPU_160MHZ);
+  update_cpu_freq = system_update_cpu_freq(160);
 
   #if defined(DEBUG) || defined(DEBUG2) || defined(DEBUG_WEB) || defined(DEBUG_WEB_VALUE)
     // Init port série pour debug
@@ -112,6 +113,8 @@ void setup() {
   // Initialisation des balances
   balancesInit();
 
+  delay(1000);
+  
   // Effacement splash et affichage du pied de page
   clearDisplay();
   affichePiedPage();

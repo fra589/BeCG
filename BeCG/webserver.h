@@ -44,5 +44,6 @@
   void handleFactory(void);
   void handleNotFound(void);
   void handleReboot(void);
+  void handleUpdate(void);
 
 #endif

@@ -26,7 +26,7 @@
 // Variables globales
 //----------------------------------------------------------------------------
 
-char nameVersion[NAME_VERSION_LEN];
+char EEPROM_Version[EEPROM_VERSION_LEN];
 
 // Capteurs de masse
 HX711 hx711_ba;

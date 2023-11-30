@@ -44,7 +44,7 @@ function update_onload() {
       e.target.classList.add('selected');
       document.getElementById('firmware-button').classList.remove('selected');
       document.getElementById("file1").name = 'filesystem';
-      document.getElementById("status").innerHTML = "Téléchargement des données";
+      document.getElementById("status").innerHTML = "Téléchargement de l'application web";
     }
   );
   document.getElementById('file1').addEventListener('change', 
@@ -59,7 +59,7 @@ function update_onload() {
       if (document.getElementById('firmware-button').classList.contains("selected")) {
         document.getElementById('status').innerHTML = "Téléchargement du Firmware";
       } else {
-        document.getElementById('status').innerHTML = "Téléchargement des données";
+        document.getElementById('status').innerHTML = "Téléchargement de l'application web";
       }
       document.getElementById("loaded_n_total").innerHTML = "";
     }

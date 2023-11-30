@@ -23,36 +23,33 @@
 
 void getEepromStartupData(void) {
   char charTmp;
-  char buffNameVersion[NAME_VERSION_LEN] = { 0 };
+  char buffEepromVersion[EEPROM_VERSION_LEN] = { 0 };
 
   // Prépare la chaine de version qui permet de vérifier les données de l'EEPROM
-  strcpy(nameVersion, APP_NAME_VERSION);
+  strcpy(EEPROM_Version, EEPROM_VERSION);
 
   //--------------------------------------------------------------------
   // Récupération des paramètres dans l'EEPROM ou de leur valeur par défaut
   //--------------------------------------------------------------------
   EEPROM.begin(EEPROM_LENGTH);
-  charTmp = char(EEPROM.read(ADDR_NAME_VERSION));
+  charTmp = char(EEPROM.read(ADDR_EEPROM_VERSION));
   if (charTmp != 0xFF) {
-    buffNameVersion[0] = charTmp;
-    for (int i=1; i<NAME_VERSION_LEN; i++) {
-      buffNameVersion[i] = char(EEPROM.read(ADDR_NAME_VERSION + i));
+    buffEepromVersion[0] = charTmp;
+    for (int i=1; i<EEPROM_VERSION_LEN; i++) {
+      buffEepromVersion[i] = char(EEPROM.read(ADDR_EEPROM_VERSION + i));
     }
-    #ifdef DEBUG
-      Serial.printf("EEPROM nameVersion..... = %s\n", buffNameVersion);
-    #endif
-    if (strncmp(nameVersion, buffNameVersion, NAME_VERSION_LEN) != 0) {
+    if (strncmp(EEPROM_Version, buffEepromVersion, EEPROM_VERSION_LEN) != 0) {
       // Les données sauvegardées dans l'EEPROM ne correspondent pas à 
       // la version en cours, il faut recharger les paramètres par défaut
       #ifdef DEBUG
-        Serial.printf("Version incorrecte des données EEPROM [%s] != [%s]\n", buffNameVersion, nameVersion);
+        Serial.printf("Version incorrecte des données EEPROM [%s] != [%s]\n", buffEepromVersion, EEPROM_Version);
       #endif
       resetFactory();
     }
   } else {
     // L'EEPROM est vide !
     #ifdef DEBUG
-      Serial.printf("l'EEPROM est vide, chargement des données d'usine.\n", buffNameVersion, nameVersion);
+      Serial.printf("l'EEPROM est vide, chargement des données d'usine.\n");
     #endif
     resetFactory();
   }
@@ -95,7 +92,7 @@ void getEepromStartupData(void) {
   EEPROM.get(ADDR_MASSE_ETALON, masseEtalon);  if (masseEtalon != masseEtalon) masseEtalon = DEFAULT_MASSE_ETALON;
 
   #ifdef DEBUG
-    Serial.printf("nameVersion............ = %s\n", nameVersion);
+    Serial.printf("EEPROM_Version......... = %s\n", EEPROM_Version);
     Serial.printf("scaleBA................ = %f\n", scaleBA);
     Serial.printf("scaleBF................ = %f\n", scaleBF);
     Serial.printf("pafBA.................. = %f\n", pafBA);
@@ -318,7 +315,7 @@ void etalonnage(void) {
   strcpy(cli_ssid, DEFAULT_CLI_SSID);
   strcpy(cli_pwd,  DEFAULT_CLI_PWD);
   strcpy(ap_ssid,  DEFAULT_AP_SSID);
-  //strcpy(ap_ssid,  DEFAULT_AP_SSID);
+  strcpy(ap_pwd,   DEFAULT_AP_PWD);
   String SSID_MAC = String(DEFAULT_AP_SSID + WiFi.softAPmacAddress().substring(9));
   SSID_MAC.toCharArray(ap_ssid, MAX_SSID_LEN);
   entraxe     = DEFAULT_ENTAXE;
@@ -328,7 +325,7 @@ void etalonnage(void) {
   // Sauvegarde en EEPROM
   EEPROM_format(); // On efface tout
   
-  EEPROM_writeStr(ADDR_NAME_VERSION, nameVersion, NAME_VERSION_LEN);
+  EEPROM_writeStr(ADDR_EEPROM_VERSION, EEPROM_Version, EEPROM_VERSION_LEN);
   
   #ifdef DEBUG
     Serial.printf("  EEPROM.put(%d, %f)\n", ADDR_SCALE_BA, scaleBA);

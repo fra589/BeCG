@@ -31,7 +31,7 @@
     <link rel="stylesheet" media="screen" type="text/css" href="style.css"/>
     <script type="text/javascript" src="scripts.js"></script>
   </head>
-  <body onload="page_onload()">
+  <body onload="index_onload()">
     <input type="hidden" id="paf_ba" name="paf_ba" value="0.0" />
     <input type="hidden" id="entraxe" name="entraxe" value="0.0" />
     <input type="hidden" id="tare" name="tare" value="0" />
@@ -59,53 +59,83 @@
       </tbody>
     </table>
 	  <div id="la_page">
-      <h2>Masses mesurées</h2>
-      <p>
-        <table>
-          <thead>
-            <tr>
-              <th>bord d'attaque</th>
-              <th>bord de fuite</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td id="ba">0.0 g</td>
-              <td id="bf">0.0 g</td>
-            </tr>
-          </tbody>
-        </table>
-      </p>
-      <h2>
-        Masse totale
-      </h2>
-      <h3 id="total">0.0 g</h3>
-      <p>
-        &nbsp;
-      </p>
-      <h2>
-        Position Centre de Gravité
-      </h2>
-      <h3 id="cg">~~~~</h3>
-      <p>
-        <img src="profil.svg" />
-      </p>
-      <div style="float: left;">
-        <input type="checkbox" id="auto_refresh" name="auto_refresh" onclick="autoRefresh()" checked="checked" />
-        <label for="auto_refresh">Auto refresh</label>
+      <div id="onglets">
+        <span id="onglet1" class="onglet selected" onclick="onglet_click('onglet1')">Mesures</span>
+        <span id="onglet2" class="onglet" onclick="onglet_click('onglet2')">Calculs</span>
       </div>
-      <!--------------------------------------------------------------------->
-      <!-- Boutons tare / étalonnage -->
-      <!--------------------------------------------------------------------->
-      <p class="alignement-droit">
-        <button id="bouton_tare" title="Remise à zéro" onclick="balance_tare()">
-          Tare
-        </button>
-        &nbsp;
-        <button id="bouton_etalonage" title="Etalonner la balance..." onclick="afficheDialog('dlgEtalonnage')">
-          Etalonnage
-        </button>
-      </p>
+      <div id="mesures">
+        <h2>Masses mesurées</h2>
+        <p>
+          <table>
+            <thead>
+              <tr>
+                <th>bord d'attaque</th>
+                <th>bord de fuite</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td id="ba">0.0 g</td>
+                <td id="bf">0.0 g</td>
+              </tr>
+            </tbody>
+          </table>
+        </p>
+        <h2>
+          Masse totale
+        </h2>
+        <h3 id="total">0.0 g</h3>
+        <p>
+          &nbsp;
+        </p>
+        <h2>
+          Position Centre de Gravité
+        </h2>
+        <h3 id="cg">~~~~</h3>
+        <p>
+          <img src="profil.svg" />
+        </p>
+        <div style="float: left;">
+          <input type="checkbox" id="auto_refresh" name="auto_refresh" onclick="autoRefresh()" checked="checked" />
+          <label for="auto_refresh">Auto refresh</label>
+        </div>
+        <!--------------------------------------------------------------------->
+        <!-- Boutons tare / étalonnage -->
+        <!--------------------------------------------------------------------->
+        <p class="alignement-droit">
+          <button id="bouton_tare" title="Remise à zéro" onclick="balance_tare()">
+            Tare
+          </button>
+          &nbsp;
+          <button id="bouton_etalonage" title="Etalonner la balance..." onclick="afficheDialog('dlgEtalonnage')">
+            Etalonnage
+          </button>
+        </p>
+      </div> <!-- id="mesures" -->
+      <div id="calculs" class="noshow">
+        <h2>Calculs lest de centrage</h2>
+        <p>
+          <label for="cg_mesure">Position CG mesurée (mm/ba)</label>
+          <input type="number" id="cg_mesure" name="cg_mesure" lang="en" value="0.0" readonly />
+          <br />
+          <label for="masse_mesure">Masse mesurée (g)</label>
+          <input type="number" id="masse_mesure" name="masse_mesure" lang="en" value="0.0" readonly />
+          <br /><br />
+          <label for="cg_voulu">Position CG désirée (mm/ba)</label>
+          <input type="number" id="cg_voulu" name="cg_voulu" value="0.0" lang="en" step="0.1"/>
+          <span id="info_cg_voulu">&nbsp;</span>
+          <br />
+          <label for="masse_lest">Masse du lest (g)</label>
+          <input type="number" id="masse_lest" name="masse_lest" value="0.0" lang="en"  step="0.1"/>
+          <span id="info_masse_lest">&nbsp;</span>
+          <br />
+          <label for="levier_lest">Bras de levier du lest (mm/ba)</label>
+          <input type="number" id="levier_lest" name="levier_lest" value="0.0" lang="en"  step="0.1"/>
+          <span id="info_levier_lest">&nbsp;</span>
+          <br /><br />
+          <i>(Bras de levier du lest : mesuré à partir du bord d'attaque, valeurs positives en arrière du bord d'attaque et négatives en avant.)</i>
+        </p>
+      </div>  <!-- id="calculs" -->
     </div> <!-- id="la_page" -->
       <p id="heure" class="noshow">&nbsp;</p>
     <hr />
@@ -129,7 +159,6 @@
           <button id="btnSuite" title="Continuer" onclick="suite_clique()">
             Suivant
           </button>
-          &nbsp;
           <button id="btnClose" title="Fermer cette boite de dialogue" onclick="closeDialog('dlgEtalonnage')">
             Fermer
           </button>

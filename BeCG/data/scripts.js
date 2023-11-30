@@ -28,14 +28,118 @@ var scale_bfOK = false
 var scale_bf   = 0.0;
 var chkRefresh_oldstate = true;
 
-function page_onload() {
+function index_onload() {
   // Mise à jour des infos de la balance
   get_settings();
+  
   // Affichage dynamique des valeurs de la balance
   setTimeout(function() { XMLHttpRequest_get("getvalues") }, 500);
 
-  //setTimeout(function() { alert(window.innerWidth + " - " + document.body.clientWidth) }, 1000);
+  // Force la sélection au focus
+  ["cg_voulu", "masse_lest", "levier_lest"].forEach(
+    function(input) {
+      document.getElementById(input).addEventListener('focusin',
+        function(e) {
+          e.target.select();
+        }
+      );
+    }
+  );
+  // force les saisies numériques 
+  ["cg_voulu", "masse_lest", "levier_lest"].forEach(
+    function(input) {
+      document.getElementById(input).addEventListener('beforeinput',
+        function(e) {
+          forceNumeric(e);
+        }
+      );
+    }
+  );
+  // memorise l'instant de la dernière saisie et lance le calcul
+  ["cg_voulu", "masse_lest", "levier_lest"].forEach(
+    function(input) {
+      document.getElementById(input).addEventListener('input',
+        function(e) {
+          var input_obj  = e.target;
+          var input_info = document.getElementById("info_" + e.target.id);
+          input_obj.last_input = Date.now();
+          //input_info.innerText = input_obj.last_input;
+          calcul_centrage();
+        }
+      );
+    }
+  );
+  // Reformate la valeur avec 1 décimale
+  ["cg_voulu", "masse_lest", "levier_lest"].forEach(
+    function(input) {
+      document.getElementById(input).addEventListener('change',
+        function(e) {
+          var input_obj  = e.target;
+          input_obj.value = parseFloat(input_obj.value).toFixed(1);
+        }
+      );
+    }
+  );
+}
 
+function calcul_centrage() {
+  var cg_voulu         = document.getElementById("cg_voulu")
+  var masse_lest       = document.getElementById("masse_lest")
+  var levier_lest      = document.getElementById("levier_lest")
+  var info_cg_voulu    = document.getElementById("info_cg_voulu");
+  var info_masse_lest  = document.getElementById("info_masse_lest");
+  var info_levier_lest = document.getElementById("info_levier_lest");
+
+  // Récupère les valeurs numériques
+  var cg              = parseFloat(document.getElementById("cg_mesure").value);
+  var masse           = parseFloat(document.getElementById("masse_mesure").value);
+  var val_cg_voulu    = parseFloat(cg_voulu.value);
+  var val_masse_lest  = parseFloat(masse_lest.value);
+  var val_levier_lest = parseFloat(levier_lest.value);
+  
+  
+  // Recherche le champ de saisie le plus ancien, 
+  // C'est celui qui sera calculé par rapport aux 2 autres
+  if (!(cg_voulu.hasOwnProperty('last_input'))) {
+    cg_voulu.last_input = 0;
+  }
+  if (!(masse_lest.hasOwnProperty('last_input'))) {
+    masse_lest.last_input = 0;
+  }
+  if (!(levier_lest.hasOwnProperty('last_input'))) {
+    levier_lest.last_input = 0;
+  }
+  
+  if ((cg_voulu.last_input < masse_lest.last_input) && (cg_voulu.last_input < levier_lest.last_input)) {
+    // Calcul de cg_voulu si les 2 autres sonts non nulls
+    if ((val_masse_lest !== 0) && (val_levier_lest !== 0)) {
+      info_cg_voulu.innerText    = "Valeur calculée"
+      info_masse_lest.innerText  = "Valeur saisie"
+      info_levier_lest.innerText = "Valeur saisie"
+      var momentMesuré = cg * masse;
+      var momentLest   = val_levier_lest * val_masse_lest;
+      val_cg_voulu    = (momentMesuré + momentLest) / (masse + val_masse_lest);
+      cg_voulu.value = val_cg_voulu.toFixed(1);
+    }
+  } else if ((masse_lest.last_input < cg_voulu.last_input) && (masse_lest.last_input < levier_lest.last_input)) {
+    // Calcul de la masse de lest
+    if ((val_cg_voulu !== 0) && (val_levier_lest.value !== 0)) {
+      info_cg_voulu.innerText    = "Valeur saisie"
+      info_masse_lest.innerText  = "Valeur calculée"
+      info_levier_lest.innerText = "Valeur saisie"
+      val_masse_lest  = (masse * (cg - val_cg_voulu)) / (val_cg_voulu - val_levier_lest);
+      masse_lest.value = val_masse_lest.toFixed(1);
+    }
+  } else if ((levier_lest.last_input < cg_voulu.last_input) && (levier_lest.last_input < masse_lest.last_input)) {
+    // Calcul du levier du lest
+    if ((val_cg_voulu !== 0) && (val_masse_lest !== 0)) {
+      info_cg_voulu.innerText    = "Valeur saisie"
+      info_masse_lest.innerText  = "Valeur saisie"
+      info_levier_lest.innerText = "Valeur calculée"
+      val_levier_lest = ((val_cg_voulu * masse) + (val_cg_voulu * val_masse_lest) - (cg * masse)) / val_masse_lest;
+      levier_lest.value = val_levier_lest.toFixed(1);
+    }
+  }
 }
 
 function netconfig_onload() {
@@ -44,6 +148,77 @@ function netconfig_onload() {
   // Retrouve la liste des réseaux vsibles
   //XMLHttpRequest_get("getnetworks");
   get_networks();
+}
+function forceNumeric(e){
+  // Elimine tout ce qui n'est par un chiffre, un point décimal, un plus ou un moins
+  if (!(/^[\+\-\d]*\.?-?\+?\d*$/.test(e.data)) && (e.data !== null)) {
+    e.preventDefault();
+  } else if ((e.data == ".") && (/\./.test(e.target.value))) {
+    // Il y aurait 2 séparateurs décimaux
+    e.preventDefault();
+  }  else if ((e.data == "+") && (/[-\+]/.test(e.target.value))) {
+    e.preventDefault();
+  }  else if ((e.data == "-") && (/[-\+]/.test(e.target.value))) {
+    e.preventDefault();
+  }
+}
+function forceInteger(e){
+  if (!(/^\d*$/.test(e.data)) && (e.data !== null)) {
+    e.preventDefault();
+  } else if ((e.data == ".") && (/\./.test(e.target.value))) {
+    e.preventDefault();
+  }
+}
+function settings_onload() {
+  // force les saisies numériques 
+  ["paf_ba", "entraxe"].forEach(
+    function(input) {
+      document.getElementById(input).addEventListener('beforeinput',
+        function(e){
+          forceNumeric(e);
+        }
+      );
+    }
+  );
+  /*
+  document.getElementById("paf_ba").addEventListener('beforeinput',
+    function(e){
+      forceNumeric(e);
+    }
+  );
+  document.getElementById("entraxe").addEventListener('beforeinput',
+    function(e){
+      forceNumeric(e);
+    }
+  );
+  */
+  document.getElementById("tare").addEventListener('beforeinput',
+    function(e){
+      forceInteger(e);
+    }
+  );
+
+  document.getElementById("paf_ba").addEventListener('focusin',
+    function(e){
+      e.target.select();
+    }
+  );
+  document.getElementById("entraxe").addEventListener('focusin',
+    function(e){
+      e.target.select();
+    }
+  );
+  document.getElementById("tare").addEventListener('focusin',
+    function(e){
+      e.target.select();
+    }
+  );
+  
+  // Récupère les données de la balance
+  get_settings();
+  
+  // Donne le focus au premier champ de saisie
+  document.getElementById("paf_ba").focus();
 }
 
 function get_settings() {
@@ -605,3 +780,41 @@ function reboot() {
   
 }
 
+function onglet_click(onglet) {
+  var onglet1 = document.getElementById("onglet1");
+  var onglet2 = document.getElementById("onglet2");
+  var calculs = document.getElementById("calculs");
+  var mesures = document.getElementById("mesures");
+
+  if (onglet == "onglet1") {
+    // Onglet Mesures
+    onglet1.classList.add("selected");
+    onglet2.classList.remove("selected");
+    mesures.classList.remove("noshow");
+    calculs.classList.add("noshow");
+  } else if (onglet == "onglet2") {
+    // Onglet Calculs
+    onglet1.classList.remove("selected");
+    onglet2.classList.add("selected");
+    mesures.classList.add("noshow");
+    calculs.classList.remove("noshow");
+
+    var cg = parseFloat(document.getElementById("cg").textContent);
+    if (isNaN(cg)) {
+      cg = 0.0;
+    }
+    
+    var total = parseFloat(document.getElementById("total").textContent);
+    if (isNaN(total)) {
+      total = 0.0;
+    }
+    //// pour tests
+/*
+    document.getElementById("cg_mesure").value = "70.0";
+    document.getElementById("masse_mesure").value = "750.0";
+*/
+    document.getElementById("cg_mesure").value = cg.toFixed(1);
+    document.getElementById("masse_mesure").value = total.toFixed(1);
+    document.getElementById("cg_voulu").value = cg.toFixed(1);
+  }
+}

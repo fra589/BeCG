@@ -58,7 +58,7 @@ void webServerInit(void) {
   httpUpdater.setup(&server); // Pour mise a jour par le réseau
   server.begin(); // Start web server
 
-  MDNS.addService("http", "tcp", 80);
+  ////MDNS.addService("http", "tcp", 80);
   
   delay(1000);
 

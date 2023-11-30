@@ -31,7 +31,7 @@
     <link rel="stylesheet" media="screen" type="text/css" href="style.css"/>
     <script type="text/javascript" src="scripts.js"></script>
   </head>
-  <body onload="get_settings()">
+  <body onload="settings_onload()">
 	  <table id="entete">
       <tbody>
         <tr>
@@ -62,13 +62,14 @@
       </div>
       <p id="balance_config">
         <label for="paf_ba">Porte à faux BA</label>
-        <input type="number" name="paf_ba" id="paf_ba" value="0.0" />
+        <input type="number" name="paf_ba" id="paf_ba" lang="en" value="0.0" />
         <br />
         <label for="entraxe">Entraxe des appuis</label>
-        <input type="number" name="entraxe" id="entraxe" value="0.0" />
+        <input type="number" name="entraxe" id="entraxe" lang="en" value="0.0" />
         <br />
         <label for="tare">Masse étalonnage</label>
-        <input type="text" name="tare" id="tare" pattern="\d*" oninput="this.value=this.value.replace(/[^0-9]/g,'');" value="0" />
+        <!--<input type="text" name="tare" id="tare" pattern="\d*" oninput="this.value=this.value.replace(/[^0-9]/g,'');" value="0" />-->
+        <input type="number" name="tare" id="tare" lang="en" value="0" />
       </p>
         <div style="float: left; margin-left: 18px;">
           <a href="/update">Mettre à jour la balance</a>
@@ -78,7 +79,7 @@
       <!-- Boutons annuler / valider -->
       <!--------------------------------------------------------------------->
       <p class="alignement-droit">
-        <button id="bouton_recharger" title="Recharger les valeurs de la balance" onclick="get_settings()">
+        <button id="bouton_recharger" title="Recharger les valeurs de la balance" onclick="get_settings(); document.getElementById('paf_ba').focus();">
           Recharger
         </button>
         &nbsp;

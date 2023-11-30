@@ -63,7 +63,7 @@ void wifiApInit(void) {
     Serial.flush();
   #endif
   WiFi.softAPConfig(apIP, apIP, netMsk);
-  WiFi.softAP(ap_ssid, ap_pwd, 11); // (AP ouverte si de mot de passe vide ou null)
+  WiFi.softAP(ap_ssid, ap_pwd, DEFAULT_AP_CHANNEL); // (AP ouverte si de mot de passe vide ou null)
 
   delay(500); // Without delay I've seen the IP address blank
   #ifdef DEBUG

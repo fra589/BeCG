@@ -818,3 +818,23 @@ function onglet_click(onglet) {
     document.getElementById("cg_voulu").value = cg.toFixed(1);
   }
 }
+
+function sauvegarder() {
+  fileName = window.prompt("Entrez le nom du fichier à sauvegarder", "BeCG");
+  if (fileName !== null) {
+     const link = document.createElement("a");
+     var content = "";
+     content += "Position CG mesurée (mm/ba),"    + document.getElementById("cg_mesure").value    + "\n";
+     content += "Masse mesurée (g),"              + document.getElementById("masse_mesure").value + "\n";
+     content += "Position CG désirée (mm/ba),"    + document.getElementById("cg_voulu").value     + "," + document.getElementById("info_cg_voulu").innerText + "\n";
+     content += "Masse du lest (g),"              + document.getElementById("masse_lest").value   + "," + document.getElementById("info_masse_lest").innerText + "\n";
+     content += "Bras de levier du lest (mm/ba)," + document.getElementById("levier_lest").value  + "," + document.getElementById("info_levier_lest").innerText + "\n";
+     const file = new Blob([content], { type: 'data:text/csv;charset=utf-8' });
+     link.href = URL.createObjectURL(file);
+     link.download = fileName + ".csv";
+     link.click();
+     URL.revokeObjectURL(link.href);
+     link.remove();
+  }
+}
+

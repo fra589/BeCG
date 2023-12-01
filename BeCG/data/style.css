@@ -101,6 +101,10 @@ h1 {
 #heure {
   /*text-align: left;*/
 }
+#la_page #btnSave {
+  width: 20em;
+  height: 3em;
+}
 #la_page button {
   text-align: center;
   margin-right: 10px;

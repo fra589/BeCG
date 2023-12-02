@@ -1,4 +1,4 @@
-# Balance électronique pour mesure du Centre de Gravité des modèles réduits d'avion.
+# Balance électronique pour mesure<br />du Centre de Gravité des modèles réduits d'avion.
 
 La balance affiche sur son écran les masse mesurées sur les appuis du bord d'attaque et du bord de fuite, la masse totale et la position du centre de gravité en millimètres mesurée à partir de la butée du bord d'attaque de l'aile.
 La balance intégre également une interface WiFi qui permet de consulter les mesures et de régler ses paramètres.

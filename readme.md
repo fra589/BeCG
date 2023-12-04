@@ -19,11 +19,5 @@ La balance est basée sur :
 La précision de mesure estimée de la masse est de l'ordre de ±0.2g, celle du calcul de centrage est estimée à environ ±0.2mm.
 
 ---
-TODO : 
-- Rédiger la documentation dans le wiki : https://github.com/fra589/BeCG/wiki,
-- Publier la bersion binaire compilée (+ doc d'install),
-- Créer l'interface de mise à jour par le WiFi (OTA),
-- intégrer dans l'application web les calculs de lests,
-- Version internationnale [Français, English, ...]
-- ... selon les idées qui remonteront ...
----
+
+<h2 align="center">Les documentations d'installation et d'utilisation se trouvent dans le WiKi :<br />https://github.com/fra589/BeCG/wiki</h2>

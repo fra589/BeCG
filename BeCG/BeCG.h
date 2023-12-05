@@ -41,9 +41,9 @@
   #include "becgwifi.h"
 
   // Pour debug sur port série
-  #define DEBUG
+  //#define DEBUG
   //#define DEBUG2          // Pour debugs dans la boucle...
-  #define DEBUG_WEB       // debug des interractions web
+  //#define DEBUG_WEB       // debug des interractions web
   //#define DEBUG_WEB_VALUE // debug des appels de valeurs web
 
   #define COPYRIGHT             "G.Bri\x8Are 2023-2023"

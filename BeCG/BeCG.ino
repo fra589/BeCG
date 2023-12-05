@@ -74,9 +74,8 @@ TrivialKalmanFilter<float> filter_ba(DT_COVARIANCE_RK, DT_COVARIANCE_QK);
 TrivialKalmanFilter<float> filter_bf(DT_COVARIANCE_RK, DT_COVARIANCE_QK);
 
 void setup() {
-  bool update_cpu_freq = false;
   // Try pushing frequency to 160MHz.
-  update_cpu_freq = system_update_cpu_freq(160);
+  bool update_cpu_freq = system_update_cpu_freq(160);
 
   #if defined(DEBUG) || defined(DEBUG2) || defined(DEBUG_WEB) || defined(DEBUG_WEB_VALUE)
     // Init port série pour debug
@@ -87,9 +86,9 @@ void setup() {
   #endif
 
   #ifdef DEBUG
-    int cpuFreq;
-    cpuFreq = ESP.getCpuFreqMHz();
-    Serial.printf("\nStarting %s on ESP8266@%dMHz (update_cpu_freq = %s)...\n\n", APP_NAME_VERSION, cpuFreq, update_cpu_freq?"true":"false");
+    //int cpuFreq = ESP.getCpuFreqMHz();
+    int cpuFreq = system_get_cpu_freq();
+    Serial.printf("\nStarting %s on ESP8266@%dMHz (system_update_cpu_freq() = %s)...\n\n", APP_NAME_VERSION, cpuFreq, update_cpu_freq?"true":"false");
     Serial.flush();
   #endif
 

@@ -267,3 +267,30 @@ h1 {
   margin-bottom: 7px;
   text-align: right;
 }
+#spanApropos {
+  display: inline-block;
+  vertical-align: bottom;
+  margin-right: 95px;
+  cursor: pointer;
+  color: darkblue;
+  text-decoration: underline;
+}
+#dlgApropos {
+  height: auto;
+}
+#imgApropos {
+  float: left;
+  height: 64px;
+}
+#apropos_version {
+  text-align: left;
+  vertical-align: bottom;
+  display: table-cell;
+  height: 64px;
+  font-size: 1.5em;
+  padding-left: 0.5em;
+}
+#btnClose1 {
+  margin-right: 12px;
+}
+

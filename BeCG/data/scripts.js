@@ -460,7 +460,9 @@ function XMLHttpResult(requette, xml, text) {
     if (requette == "getversion") {
       var version_string = xml.getElementsByTagName("string")[0].childNodes[0].nodeValue;
       var doc_version = document.getElementById("version");
+      var doc_version2 = document.getElementById("apropos_version");
       doc_version.textContent = version_string;
+      doc_version2.textContent = version_string;
 
     } else if (requette == "getwifi") {
       var ap_ssid  = xml.getElementsByTagName("ap_ssid")[0].childNodes[0].nodeValue;
@@ -838,3 +840,21 @@ function sauvegarder() {
   }
 }
 
+function showApropos() {
+  // Affiche le fond gris
+  var dlgMask = document.getElementById("dlgMask1");
+  var divApropos = document.getElementById("dlgApropos");
+  dlgMask.classList.remove("noshow");
+  window.setTimeout(function () {
+    divApropos.classList.remove("masquer");
+  }, 0.25);
+}
+
+function closeApropos() {
+  var dlgMask = document.getElementById("dlgMask1");
+  var divApropos = document.getElementById("dlgApropos");
+  divApropos.classList.add("masquer");
+    window.setTimeout(function () {
+    dlgMask.classList.add("noshow");
+  }, 0.25);
+}

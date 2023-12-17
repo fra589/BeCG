@@ -103,6 +103,7 @@
         <!-- Boutons tare / étalonnage -->
         <!--------------------------------------------------------------------->
         <p class="alignement-droit">
+          <span id="spanApropos" onclick="showApropos()">A propos de BeCG...</span>
           <button id="bouton_tare" title="Remise à zéro" onclick="balance_tare()">
             Tare
           </button>
@@ -170,7 +171,25 @@
       <div id="cadre_attente">
        <div id="attente0" class="attente noshow"></div>
       </div>
-    </div>
+    </div> <!-- dlgMask0 -->
+    <div id="dlgMask1" class="dlgMask noshow">
+      <div id="dlgApropos" class="dialog masquer">
+        <div id="dlgContenu1" class="dlgContenu">
+          <span id="imgApropos"><img src="BeCG-couleur.svg" /></span><span id="apropos_version">v0.0.00000000</span>
+          <p style="text-align: left;">
+            Balance électronique pour mesure et positionnement du Centre de Gravité des modèles réduits d'avion.
+          </p>
+          <p>
+            Copyright © Gauthier Brière (<a href="https://github.com/fra589/BeCG">fra589</a>) - 2023
+          </p>
+        </div> <!-- dlgContenu1 -->
+        <p class="alignement-droit">
+          <button id="btnClose1" title="Fermer" onclick="closeApropos()">
+            Fermer
+          </button>
+        </p>
+      </div> <!-- dlgApropos -->
+    </div> <!-- dlgMask1 -->
   </body>
 </html>
 

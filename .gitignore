@@ -6,5 +6,6 @@ no_git
 *.FCStd1
 build
 builds
+doc
 ssd1306-1.8.3
 HX711_Arduino_Library

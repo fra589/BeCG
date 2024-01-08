@@ -7,7 +7,7 @@ La balance intégre également une interface WiFi qui permet de consulter les me
 
 Une fois la connexion effectuée, on accède à son interface au travers d'un navigateur web standard.
 <p align='center'>
-<img src='https://github.com/fra589/BeCG/blob/master/images/perspectiveFreeCAD.png' width='50%' />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src='https://github.com/fra589/BeCG/blob/master/images/Screenshot_captiveportal.jpg' width='17%' />
+<img src='https://github.com/fra589/BeCG/blob/master/images/perspectiveFreeCAD.png' width='50%' />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src='https://github.com/fra589/BeCG/blob/master/images/captureDouble.png' width='17%' />
 </p>
 
 La balance est basée sur :

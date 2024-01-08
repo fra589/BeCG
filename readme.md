@@ -1,4 +1,4 @@
-<h1 align="center"><img align="left" src='https://github.com/fra589/BeCG/blob/master/BeCG/data/BeCG-couleur.svg' width='25%' />Balance électronique pour mesure<br />du Centre de Gravité<br />des modèles réduits d'avion.</h1>
+<h1 align="center"><img align="left" src='https://github.com/fra589/BeCG/blob/master/BeCG/data/BeCG-couleur.svg' width='25%' />Balance électronique pour mesure<br />et calculs du Centre de Gravité<br />des modèles réduits d'avion.</h1>
 
 La balance affiche sur son écran les masse mesurées sur les appuis du bord d'attaque et du bord de fuite, la masse totale et la position du centre de gravité en millimètres mesurée à partir de la butée du bord d'attaque de l'aile.
 La balance intégre également une interface WiFi qui permet de consulter les mesures et de régler ses paramètres.

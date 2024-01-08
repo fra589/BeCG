@@ -270,7 +270,7 @@ h1 {
 #spanApropos {
   display: inline-block;
   vertical-align: bottom;
-  margin-right: 95px;
+  /*margin-right: 95px;*/
   cursor: pointer;
   color: darkblue;
   text-decoration: underline;

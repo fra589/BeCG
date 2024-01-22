@@ -113,14 +113,26 @@ void balancesInit(void) {
   #endif
   hx711_ba.begin(LOADCELL_BA_DOUT_PIN, LOADCELL_BA_SCK_PIN, 64);
   hx711_bf.begin(LOADCELL_BF_DOUT_PIN, LOADCELL_BF_SCK_PIN, 64);
+  yield();
+  #ifdef DEBUG
+    Serial.println("HX711 begin OK.");
+  #endif
 
   if ((hx711_ba.wait_ready_timeout(1000)) && (hx711_bf.wait_ready_timeout(1000))) {
+    yield();
+    #ifdef DEBUG
+      Serial.println("HX711 ready no timeout...");
+    #endif
     // Initialise la tare (zéro) et l'échelle des balance
     hx711_ba.set_scale();
     hx711_ba.tare();
     hx711_bf.set_scale();
     hx711_bf.tare();
     delay(250);
+    yield();
+    #ifdef DEBUG
+      Serial.println("HX711 set_scale() + tare() OK...");
+    #endif
 
     // Etalonnage des Balance :
     if (scaleBA != 0.0) {
@@ -134,6 +146,7 @@ void balancesInit(void) {
       hx711_ba.set_scale(DEFAULT_SCALE_BA);
     }
     delay(250);
+    yield();
     #ifdef DEBUG
       Serial.println("HX711 prets.");
     #endif

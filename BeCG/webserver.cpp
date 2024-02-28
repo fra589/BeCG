@@ -1,6 +1,6 @@
 /****************************************************************************/
 /*                                                                          */
-/* Copyright (C) 2023-2023 Gauthier Brière (gauthier.briere "at" gmail.com) */
+/* Copyright (C) 2023-2024 Gauthier Brière (gauthier.briere "at" gmail.com) */
 /*                                                                          */
 /* This file: webserver.cpp is part of BeCG                                 */
 /*                                                                          */
@@ -35,6 +35,10 @@ void webServerInit(void) {
   server.enableCORS(true);
   server.on("/", handleRoot);
   server.on(ROOT_FILE, handleRoot); // index.html
+  server.on("/connecttest.txt", handleRoot);
+  server.on("/generate_204", handleRoot); //Android captive portal. Maybe not needed. Might be handled By notFound handler.
+  server.on("/favicon.ico", handleRoot);  //Another Android captive portal. Maybe not needed. Might be handled By notFound handler. Checked on Sony Handy
+  server.on("/fwlink", handleRoot);       //Microsoft captive portal. Maybe not needed. Might be handled By notFound handler.
   server.on("/getvalues", handleGetValues);
   server.on("/getversion", handleGetVersion);
   server.on("/getwifi", handleGetWifi);
@@ -89,6 +93,10 @@ bool captivePortal(void) {
 void handleRoot(void) {
   String buffer = "";
   File file;
+
+  if (captivePortal()) { // If caprive portal redirect instead of displaying the page.
+    return;
+  }
 
   #ifdef DEBUG_WEB
     Serial.println("Entrée dans handleRoot()");

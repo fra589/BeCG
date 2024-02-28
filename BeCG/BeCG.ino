@@ -1,6 +1,6 @@
 /****************************************************************************/
 /*                                                                          */
-/* Copyright (C) 2023-2023 Gauthier Brière (gauthier.briere "at" gmail.com) */
+/* Copyright (C) 2023-2024 Gauthier Brière (gauthier.briere "at" gmail.com) */
 /*                                                                          */
 /* This file: BeCG.ino is part of BeCG                                      */
 /*                                                                          */
@@ -129,14 +129,30 @@ void loop() {
   float masse_bf = 0.0;
   int digitAffiche = -1;
   int digit = 0;
-  
+
+  // Pour laisser du temps au WiFi...
+  delay(10);
+  // https://forum.arduino.cc/t/yield-utilite-fonctionnement/883558
+  yield();
+
   //DNS
   dnsServer.processNextRequest();
   if (WiFi.status() == WL_CONNECTED) {
     MDNS.update();
   }
+
+  // Pour laisser du temps au WiFi...
+  delay(10);
+  // https://forum.arduino.cc/t/yield-utilite-fonctionnement/883558
+  yield();
+
   //HTTP
   server.handleClient();
+
+  // Pour laisser du temps au WiFi...
+  delay(10);
+  // https://forum.arduino.cc/t/yield-utilite-fonctionnement/883558
+  yield();
 
   // Etat du bouton de tarrage
   if (!disableBouton) {
@@ -179,17 +195,26 @@ void loop() {
     }
   } // if (!disableBouton)
 
+  // Pour laisser du temps au WiFi...
+  delay(10);
+  // https://forum.arduino.cc/t/yield-utilite-fonctionnement/883558
+  yield();
+
   if (!disableMesure) {
     // Mesure des masses
-    if (hx711_ba.wait_ready_timeout(1000) && hx711_bf.wait_ready_timeout(1000)) {
+    if (hx711_ba.wait_ready_timeout(1000, 5) && hx711_bf.wait_ready_timeout(1000, 5)) {
       debut = millis();
       masse_ba = hx711_ba.get_units();
       masse_bf = hx711_bf.get_units();
       now = millis();
 
+      yield();
+
       // On applique le filtre de Kalman
       valeurMoy_ba = filter_ba.update(masse_ba);
       valeurMoy_bf = filter_bf.update(masse_bf);
+
+      yield();
 
       #ifdef DEBUG2
         /*
@@ -229,5 +254,10 @@ void loop() {
     afficheCG(positionCG);
     
   } // if (!disableMesure)
+
+  // Pour laisser du temps au WiFi...
+  delay(10);
+  // https://forum.arduino.cc/t/yield-utilite-fonctionnement/883558
+  yield();
 
 }

@@ -1,6 +1,6 @@
 /****************************************************************************/
 /*                                                                          */
-/* Copyright (C) 2023-2023 Gauthier Brière (gauthier.briere "at" gmail.com) */
+/* Copyright (C) 2023-2024 Gauthier Brière (gauthier.briere "at" gmail.com) */
 /*                                                                          */
 /* This file: BeCG.h is part of BeCG                                        */
 /*                                                                          */
@@ -41,22 +41,22 @@
   #include "becgwifi.h"
 
   // Pour debug sur port série
-  //#define DEBUG
+  #define DEBUG
   //#define DEBUG2          // Pour debugs dans la boucle...
   //#define DEBUG_WEB       // debug des interractions web
   //#define DEBUG_WEB_VALUE // debug des appels de valeurs web
 
-  #define COPYRIGHT             "G.Bri\x8Are 2023-2023"
+  #define COPYRIGHT             "G.Bri\x8Are 2023-2024"
   #define ORG_NAME              "fra589"
   #define APP_NAME              "BeCG"
   #define APP_VERSION_MAJOR     "0"
   #define APP_VERSION_MINOR     "9"
-  #define APP_VERSION_DATE      "20240122"
+  #define APP_VERSION_DATE      "20240227"
   #define APP_VERSION_STRING    "v" APP_VERSION_MAJOR "." APP_VERSION_MINOR "." APP_VERSION_DATE
   #define APP_NAME_VERSION      APP_NAME " - " APP_VERSION_STRING "\0"
   #define EEPROM_VERSION_MAJOR  "0"
   #define EEPROM_VERSION_MINOR  "9"
-  #define EEPROM_VERSION_REVIS  "0"
+  #define EEPROM_VERSION_REVIS  "1"
   #define EEPROM_VERSION        APP_NAME " EEPROM v" EEPROM_VERSION_MAJOR "." EEPROM_VERSION_MINOR "." EEPROM_VERSION_REVIS
 
   #define EEPROM_VERSION_LEN 32
@@ -68,13 +68,13 @@
   #define ADDR_SCALE_BA       32 // =   0 + 32 longueur  4 octets
   #define ADDR_SCALE_BF       36 // =  32 +  4 longueur  4 octets
   #define ADDR_CLI_SSID       40 // =  36 +  4 longueur 32 octets
-  #define ADDR_CLI_PWD        56 // =  40 + 32 longueur 63 octets
-  #define ADDR_AP_SSID       119 // =  56 + 63 longueur 32 octets
-  #define ADDR_AP_PWD        151 // = 119 + 32 longueur 63 octets
-  #define ADDR_AP_CHANNEL    214 // = 151 + 63 longueur  2 octets
-  #define ADDR_ENTRAXE       216 // = 214 +  2 longueur  4 octets
-  #define ADDR_PAF_BA        220 // = 216 +  4 longueur  4 octets
-  #define ADDR_MASSE_ETALON  224 // = 220 +  4 longueur  2 octets
+  #define ADDR_CLI_PWD        72 // =  40 + 32 longueur 63 octets
+  #define ADDR_AP_SSID       135 // =  56 + 63 longueur 32 octets
+  #define ADDR_AP_PWD        167 // = 119 + 32 longueur 63 octets
+  #define ADDR_AP_CHANNEL    230 // = 151 + 63 longueur  2 octets
+  #define ADDR_ENTRAXE       232 // = 214 +  2 longueur  4 octets
+  #define ADDR_PAF_BA        236 // = 216 +  4 longueur  4 octets
+  #define ADDR_MASSE_ETALON  240 // = 220 +  4 longueur  2 octets
 
   // Données mécanique de la balance
   #define DEFAULT_ENTAXE          125.0 // (mm) Distance entre las appuis BA et BF

@@ -1,6 +1,6 @@
 /****************************************************************************/
 /*                                                                          */
-/* Copyright (C) 2023-2023 Gauthier Brière (gauthier.briere "at" gmail.com) */
+/* Copyright (C) 2023-2024 Gauthier Brière (gauthier.briere "at" gmail.com) */
 /*                                                                          */
 /* This file: webserver.h is part of BeCG                                   */
 /*                                                                          */

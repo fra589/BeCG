@@ -24,6 +24,9 @@ var compteRebour = rebootDelay;
 
 function update_onload() {
 
+  // retrouve la langue
+  LANG = get_lang();
+
   // Vide le contenu du file input
   document.getElementById('file1').value = "";
   
@@ -36,15 +39,23 @@ function update_onload() {
       e.target.classList.add('selected');
       document.getElementById('filesystem-button').classList.remove('selected');
       document.getElementById("file1").name = 'firmware';
-      document.getElementById("status").innerHTML = "Téléchargement du Firmware";
+      if (LANG == "en") {
+        document.getElementById("status").innerHTML = "Firmware Upload";
+      } else {
+        document.getElementById("status").innerHTML = "Téléchargement du Firmware";
       }
+    }
   );
   document.getElementById('filesystem-button').addEventListener('click',
     function (e) {
       e.target.classList.add('selected');
       document.getElementById('firmware-button').classList.remove('selected');
       document.getElementById("file1").name = 'filesystem';
-      document.getElementById("status").innerHTML = "Téléchargement de l'application web";
+      if (LANG == "en") {
+        document.getElementById("status").innerHTML = "Web application Upload";
+      } else {
+        document.getElementById("status").innerHTML = "Téléchargement de l'application web";
+      }
     }
   );
   document.getElementById('file1').addEventListener('change', 
@@ -57,9 +68,9 @@ function update_onload() {
         document.getElementById('button-send').disabled = true;
       }
       if (document.getElementById('firmware-button').classList.contains("selected")) {
-        document.getElementById('status').innerHTML = "Téléchargement du Firmware";
+        document.getElementById('status').innerHTML = "Firmware Upload";
       } else {
-        document.getElementById('status').innerHTML = "Téléchargement de l'application web";
+        document.getElementById('status').innerHTML = "Web application Upload";
       }
       document.getElementById("loaded_n_total").innerHTML = "";
     }
@@ -97,14 +108,26 @@ function uploadFile() {
   xhttp.send(formdata);
 }
 function progressHandler(event) {
-  document.getElementById("loaded_n_total").innerHTML = "Envoyés " + event.loaded + " octets sur " + event.total;
+  if (LANG == "en") {
+    document.getElementById("loaded_n_total").innerHTML = "Sent " + event.loaded + " bytes of " + event.total;
+  } else {
+    document.getElementById("loaded_n_total").innerHTML = "Envoyés " + event.loaded + " octets sur " + event.total;
+  }
   var percent = Math.round((event.loaded / event.total) * 100);
   document.getElementById("progressBar").value = percent;
-  document.getElementById("status").innerHTML = percent + "% Téléchargé... patientez quelques instants";
+  if (LANG == "en") {
+    document.getElementById("status").innerHTML = percent + "% Uploaded... wait a few moments";
+  } else {
+    document.getElementById("status").innerHTML = percent + "% Téléchargé... patientez quelques instants";
+  }
 }
 function completeHandler(event) {
   enableAll();
-  document.getElementById("status").innerHTML = "Téléchargement réussi."; //event.target.responseText;
+  if (LANG == "en") {
+    document.getElementById("status").innerHTML = "Upload successful."; //event.target.responseText;
+  } else {
+    document.getElementById("status").innerHTML = "Téléchargement réussi."; //event.target.responseText;
+  }
   //document.getElementById("progressBar").value = 0; //wil clear progress bar after successful upload
   // Affiche l'image d'attente
   var dlgMask = document.getElementById("dlgMask0");
@@ -124,11 +147,19 @@ function startHandler(event) {
 }
 function errorHandler(event) {
   enableAll();
-  document.getElementById("status").innerHTML = "Erreur du téléchargement.";
+  if (LANG == "en") {
+    document.getElementById("status").innerHTML = "Upload error."; //event.target.responseText;
+  } else {
+    document.getElementById("status").innerHTML = "Erreur du téléchargement."; //event.target.responseText;
+  }
 }
 function abortHandler(event) {
     enableAll();
-    document.getElementById("status").innerHTML = "Téléchargement annulé.";
+    if (LANG == "en") {
+      document.getElementById("status").innerHTML = "Upload canceled."; //event.target.responseText;
+    } else {
+      document.getElementById("status").innerHTML = "Téléchargement annulé."; //event.target.responseText;
+    }
 }
 function rebours() {
   // Mise à jour compte à rebour en attendant le reboot

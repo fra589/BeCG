@@ -71,11 +71,29 @@ void clearDisplay(void) {
 // Efface l'écran et affiche le message passé en argument
 void afficheMessage(const char *message) {
 
+  // Traduction du message
+  char* msg = tr(lang, message);
+
+  #ifdef DEBUG
+    Serial.printf("Message traduit : %s\n", msg);
+  #endif
+
+  // Conversion des accents utf8 en CP437
+  // (la librairie Adafruit_SSD1306 ne connait que CP437)
+  // A voir ici pour conversion UTF8 -> GFX Latin 1 (CP437)
+  // https://www.sigmdel.ca/michel/program/misc/gfxfont_8bit_fr.html
+  String tmpString = msg;
+  tmpString.replace("à", "\x85");
+  tmpString.replace("é", "\x82");
+  tmpString.replace("è", "\x8A");
+
   clearDisplay();
   display.setTextSize(1, 2);
   display.setCursor(0, 0);
-  display.print(message);
+  display.print(tmpString.c_str());
   display.display();
+
+  free(msg);
 
 }
 

@@ -40,10 +40,13 @@
   }
   
   void onProbeRequestPrint(const WiFiEventSoftAPModeProbeRequestReceived& evt) {
+    /*
     Serial.print("Probe request from: ");
     Serial.print(macToString(evt.mac));
     Serial.print(" RSSI: ");
     Serial.println(evt.rssi);
+    */
+    ;
   }
 
 #endif

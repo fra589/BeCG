@@ -41,6 +41,7 @@
   void handleSetSettings(void);
   void handleWifiConnect(void);
   void handleDeconnection(void);
+  void handleSetLang(void);
   void handleFactory(void);
   void handleNotFound(void);
   void handleReboot(void);

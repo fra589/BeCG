@@ -2,7 +2,7 @@
 /*                                                                          */
 /* Copyright (C) 2023-2024 Gauthier Brière (gauthier.briere "at" gmail.com) */
 /*                                                                          */
-/* This file: tools.h is part of BeCG                                       */
+/* This file: translate.cpp is part of BeCG                                 */
 /*                                                                          */
 /* BeCG is free software: you can redistribute it and/or modify it          */
 /* under the terms of the GNU General Public License as published by        */
@@ -19,26 +19,38 @@
 /*                                                                          */
 /****************************************************************************/
 
-#ifndef tools_h
-  #define tools_h
+#include "BeCG.h"
 
-  extern bool reset_scale_en_cours;
-  extern bool tare_en_cours;
-  extern bool etalonnage_en_cours;
+char translations[NB_TRANSLATIONS][NB_LANG+1][MAX_LENGHT] = TRANSLATIONS;
 
-  void getEepromStartupData(void);
-  void balancesInit(void);
-  void tare(void);
-  void resetScale(void);
-  float etalon(String uri);
-  void etalonnage(void);
-  void waitForTareButton(void);
-  void resetFactory(void);
-  void EEPROM_format(void);
-  void EEPROM_writeStr(int address, char *value, int len);
-
-  bool isIp(String str);
-  String IPtoString(IPAddress ip);
-  String macToString(const unsigned char* mac);
-
-#endif // tools_h
+char* tr(const char* lang, const char* a_traduire) {
+  
+  int ilang;
+  int i;
+  char *buff = NULL;
+  
+  if (strncmp(lang, "en", (size_t)LANG_LEN) == 0) {
+    ilang = EN;
+  } else {
+    ilang = FR; // Par défaut, on est en Français
+  }
+  
+  for (i=0; i<NB_TRANSLATIONS; i++) {
+    if (strncmp(a_traduire, &translations[i][0][0], MAX_LENGHT) == 0) {
+      buff=(char*)malloc((strlen(&translations[i][ilang][0])+1)*sizeof(char));
+      if (buff) {
+        strcpy(buff, &translations[i][ilang][0]);
+      }
+      break;
+    }
+  }
+  
+  if (buff) {
+    return buff;
+  } else {
+    buff=(char*)malloc((strlen(a_traduire)+1)*sizeof(char));
+    strcpy(buff, a_traduire);
+    return buff;
+  }
+  
+}

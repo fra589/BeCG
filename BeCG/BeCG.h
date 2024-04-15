@@ -33,6 +33,7 @@
   #include <LittleFS.h>
   #include <ESP8266HTTPUpdateServer.h>
 
+  #include "translate.h"
   #include "TrivialKalmanFilter.h"
   #include "bitmaps.h"
   #include "affichage.h"
@@ -43,7 +44,7 @@
   // Pour debug sur port série
   #define DEBUG
   //#define DEBUG2          // Pour debugs dans la boucle...
-  //#define DEBUG_WEB       // debug des interractions web
+  #define DEBUG_WEB       // debug des interractions web
   //#define DEBUG_WEB_VALUE // debug des appels de valeurs web
 
   #define COPYRIGHT             "G.Bri\x8Are 2023-2024"
@@ -56,7 +57,7 @@
   #define APP_NAME_VERSION      APP_NAME " - " APP_VERSION_STRING "\0"
   #define EEPROM_VERSION_MAJOR  "0"
   #define EEPROM_VERSION_MINOR  "9"
-  #define EEPROM_VERSION_REVIS  "1"
+  #define EEPROM_VERSION_REVIS  "2"
   #define EEPROM_VERSION        APP_NAME " EEPROM v" EEPROM_VERSION_MAJOR "." EEPROM_VERSION_MINOR "." EEPROM_VERSION_REVIS
 
   #define EEPROM_VERSION_LEN 32
@@ -64,25 +65,29 @@
 
   // Adresses EEProm pour sauvegarde des paramètres
   #define EEPROM_LENGTH 512
-  #define ADDR_EEPROM_VERSION  0 // =      32 caractères de long
-  #define ADDR_SCALE_BA       32 // =   0 + 32 longueur  4 octets
-  #define ADDR_SCALE_BF       36 // =  32 +  4 longueur  4 octets
-  #define ADDR_CLI_SSID       40 // =  36 +  4 longueur 32 octets
-  #define ADDR_CLI_PWD        72 // =  40 + 32 longueur 63 octets
-  #define ADDR_AP_SSID       135 // =  56 + 63 longueur 32 octets
-  #define ADDR_AP_PWD        167 // = 119 + 32 longueur 63 octets
-  #define ADDR_AP_CHANNEL    230 // = 151 + 63 longueur  2 octets
-  #define ADDR_ENTRAXE       232 // = 214 +  2 longueur  4 octets
-  #define ADDR_PAF_BA        236 // = 216 +  4 longueur  4 octets
-  #define ADDR_MASSE_ETALON  240 // = 220 +  4 longueur  2 octets
+  #define ADDR_EEPROM_VERSION  0 //   0 + 32 =  32
+  #define ADDR_SCALE_BA       32 //  32 +  4 =  36
+  #define ADDR_SCALE_BF       36 //  36 +  4 =  40
+  #define ADDR_CLI_SSID       40 //  40 + 32 =  72
+  #define ADDR_CLI_PWD        72 //  72 + 63 = 135
+  #define ADDR_AP_SSID       135 // 135 + 32 = 167
+  #define ADDR_AP_PWD        167 // 167 + 63 = 230
+  #define ADDR_AP_CHANNEL    230 // 230 +  2 = 232
+  #define ADDR_ENTRAXE       232 // 232 +  4 = 236
+  #define ADDR_PAF_BA        236 // 236 +  4 = 240
+  #define ADDR_MASSE_ETALON  240 // 240 +  2 = 242
+  #define ADDR_LANG          242 // 242 +  3
 
   // Données mécanique de la balance
   #define DEFAULT_ENTAXE          125.0 // (mm) Distance entre las appuis BA et BF
   #define DEFAULT_PAF_BA           15.0 // (mm) Distance entre appuis BA et Cale bord attaque
   #define DEFAULT_MASSE_ETALON    500   // (g) Masse utilisée pour l'étalonnage
+  #define DEFAULT_LANG            "fr"
   extern float entraxe;
   extern float pafBA;
   extern int16_t masseEtalon;
+  #define LANG_LEN 2
+  extern char lang[LANG_LEN + 1];
 
   // Câblages HX711 
   #define LOADCELL_BA_DOUT_PIN 12 // D6/GPIO12

@@ -22,6 +22,7 @@
 #include "BeCG.h"
 
 void webServerInit(void) {
+
   // Montage du système de fichier ou sont stockés les éléments web
   if (!LittleFS.begin()) {
     ;
@@ -33,30 +34,31 @@ void webServerInit(void) {
 
   // Setup web pages
   server.enableCORS(true);
-  server.on("/", handleRoot);
-  server.on(ROOT_FILE, handleRoot); // index.html
-  server.on("/connecttest.txt", handleRoot);
-  server.on("/generate_204", handleRoot); //Android captive portal. Maybe not needed. Might be handled By notFound handler.
-  server.on("/favicon.ico", handleRoot);  //Another Android captive portal. Maybe not needed. Might be handled By notFound handler. Checked on Sony Handy
-  server.on("/fwlink", handleRoot);       //Microsoft captive portal. Maybe not needed. Might be handled By notFound handler.
-  server.on("/getvalues", handleGetValues);
-  server.on("/getversion", handleGetVersion);
-  server.on("/getwifi", handleGetWifi);
-  server.on("/getnetworks", handleGetNetworks);
-  server.on("/affichage", handleAffichage);
-  server.on("/tare", handleTare);
-  server.on("/resetscale", handleResetScale);
-  server.on("/etalonba", handleEtalon);
-  server.on("/etalonbf", handleEtalon);
-  server.on("/stopmesure", handleStopMesure);
-  server.on("/startmesure", handleStartMesure);
-  server.on("/reboot", handleReboot);
-  server.on("/getsettings", handleGetSettings);
-  server.on("/setsettings", handleSetSettings);
-  server.on("/wificonnect", handleWifiConnect);
-  server.on("/deconnexion", handleDeconnection);
-  server.on("/resetfactory", handleFactory);
-  server.on("/update", HTTP_GET, handleUpdate);
+  server.on(ROOT_FILE,           handleRoot); // index.html => /<en/fr>/index.html
+  server.on("/",                 handleRoot);
+  server.on("/connecttest.txt",  handleRoot);
+  server.on("/generate_204",     handleRoot); //Android captive portal. Maybe not needed. Might be handled By notFound handler.
+  server.on("/favicon.ico",      handleRoot); //Another Android captive portal. Maybe not needed. Might be handled By notFound handler. Checked on Sony Handy
+  server.on("/fwlink",           handleRoot); //Microsoft captive portal. Maybe not needed. Might be handled By notFound handler.
+  server.on("/getvalues",        handleGetValues);
+  server.on("/getversion",       handleGetVersion);
+  server.on("/getwifi",          handleGetWifi);
+  server.on("/getnetworks",      handleGetNetworks);
+  server.on("/affichage",        handleAffichage);
+  server.on("/tare",             handleTare);
+  server.on("/resetscale",       handleResetScale);
+  server.on("/etalonba",         handleEtalon);
+  server.on("/etalonbf",         handleEtalon);
+  server.on("/stopmesure",       handleStopMesure);
+  server.on("/startmesure",      handleStartMesure);
+  server.on("/reboot",           handleReboot);
+  server.on("/getsettings",      handleGetSettings);
+  server.on("/setsettings",      handleSetSettings);
+  server.on("/wificonnect",      handleWifiConnect);
+  server.on("/deconnexion",      handleDeconnection);
+  server.on("/setlang",          handleSetLang);
+  server.on("/resetfactory",     handleFactory);
+  server.on("/update",           handleUpdate);
   server.onNotFound(handleNotFound);
   
   httpUpdater.setup(&server); // Pour mise a jour par le réseau
@@ -77,35 +79,50 @@ void webServerInit(void) {
 // retourne true dans ce cas pour éviter que la page ne renvoie plusieurs fois
 // la requette.
 bool captivePortal(void) {
+
   if (!isIp(server.hostHeader()) && server.hostHeader() != (String(myHostname) + ".local")) {
     #ifdef DEBUG_WEB
       Serial.println("Redirection vers le portail captif");
     #endif
-    server.sendHeader("Location", String("http://") + IPtoString(server.client().localIP()), true);
+    server.sendHeader("Location", String("http://") + IPtoString(server.client().localIP()) + "/" + String(lang) + "/index.html", true);
     server.send(302, "text/plain", "");   // Empty content inhibits Content-length header so we have to close the socket ourselves.
     server.client().stop(); // Stop is needed because we sent no content length
     return true;
   }
+
   return false;
+
 }
 
 //Handles http request 
 void handleRoot(void) {
+
   String buffer = "";
   File file;
+
+  #ifdef DEBUG_WEB
+    Serial.println("Entrée dans handleRoot()");
+    Serial.print("server.hostHeader() = ");
+    Serial.println(server.hostHeader());
+    String uri = ESP8266WebServer::urlDecode(server.uri()); 
+    Serial.print("server.uri() = ");
+    Serial.println(uri);
+  #endif
 
   if (captivePortal()) { // If caprive portal redirect instead of displaying the page.
     return;
   }
 
   #ifdef DEBUG_WEB
-    Serial.println("Entrée dans handleRoot()");
+    Serial.println("captivePortal() returned false, sending index.html");
   #endif
 
-  handleFileRead("/index.html");
+  handleFileRead("/" + String(lang) + "/index.html");
+
 }
 
 void handleGetValues(void) {
+
   float valeur = 0.0;
   String XML;
 
@@ -140,6 +157,7 @@ void handleGetValues(void) {
 }
 
 void handleGetVersion(void) {
+
   String XML;
 
   #ifdef DEBUG_WEB
@@ -406,10 +424,6 @@ void handleAffichage(void) {
 
   String uri = ESP8266WebServer::urlDecode(server.uri());  // required to read paths with blanks
 
-// A voir ici pour conversion UTF8 -> GFX Latin 1 (CP437)
-// https://www.sigmdel.ca/michel/program/misc/gfxfont_8bit_fr.html
-
-
   #ifdef DEBUG_WEB
     Serial.printf("Entrée dans handleAffichage() --- %d\n", millis()/1000);
     Serial.printf("uri encodée = [%s]\n", server.uri());
@@ -425,12 +439,14 @@ void handleAffichage(void) {
       #ifdef DEBUG_WEB
         Serial.printf("  handleAffichage() - envoi du texte sur l'écran\n");
       #endif
-      //afficheMessage(formateCP437(server.arg(i).c_str()).c_str());
+      /* conversion effectuée dans afficheMessage()
       tmpString = server.arg(i);
       tmpString.replace("à", "\x85");
       tmpString.replace("é", "\x82");
       tmpString.replace("è", "\x8A");
       afficheMessage(tmpString.c_str());
+      */
+      afficheMessage(server.arg(i).c_str());
     } else if (strncasecmp(server.argName(i).c_str(), "reset", (size_t)5) == 0) {
       #ifdef DEBUG_WEB
         Serial.printf("  handleAffichage() - Reset écran\n");
@@ -507,6 +523,9 @@ bool handleFileRead(String path) {
   contentType = mime::getContentType(path);
 
   if (LittleFS.exists(path)) {
+    #ifdef DEBUG_WEB
+      Serial.printf("LittleFS.exists(\"%s\") OK\n", path.c_str());
+    #endif
     file = LittleFS.open(path, "r");
     if (server.streamFile(file, contentType) != file.size()) {
       ;
@@ -534,13 +553,8 @@ void handleNotFound(void) {
     Serial.printf("- uri = %s\n", uri.c_str());
   #endif
 
-  // 
+  // Cherche le fichier sur LittleFS
   if (handleFileRead(uri)) {
-    return;
-  }
-
-  // If captive portal redirect instead of displaying the error page.
-  if (captivePortal()) {
     return;
   }
 
@@ -889,6 +903,42 @@ void handleDeconnection(void) {
   // Renvoi la réponse au client http
   server.sendHeader("Access-Control-Allow-Origin", "*");
   server.send(200,"text/xml",XML);
+
+}
+
+void handleSetLang(void) {
+  // Met à jour et mémorise la langue choisie dans la flash
+
+  bool settingChange = false;
+  
+  String XML;
+
+  #ifdef DEBUG_WEB
+    Serial.printf("Entrée dans handleSetLang() --- %d\n", millis()/1000);
+    Serial.printf("  Nb arguments = %d\n", server.args());
+  #endif
+
+  //Traitement des données POST
+  for (int i = 0; i < server.args(); i++) {
+    #ifdef DEBUG_WEB
+      Serial.printf("  handleSetLang() - Arg n°%d –> %s = [%s]\n", i, server.argName(i), server.arg(i).c_str());
+    #endif
+    if (strncasecmp(server.argName(i).c_str(), "lang", (size_t)4) == 0) {
+      if ((server.arg(i) == "fr") || (server.arg(i) == "en")) {
+        if (strncmp(server.arg(i).c_str(), lang, (size_t)LANG_LEN) != 0) {
+          // changement de langue
+          strcpy(lang, server.arg(i).c_str());
+          settingChange = true;
+        }
+      }
+    }
+  }
+
+  if (settingChange) {
+    // Sauvegarde dans l'EEPROM
+    EEPROM_writeStr(ADDR_LANG, lang, LANG_LEN);
+    EEPROM.commit();
+  }
 
 }
 

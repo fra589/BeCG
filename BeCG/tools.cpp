@@ -2,7 +2,7 @@
 /*                                                                          */
 /* Copyright (C) 2023-2024 Gauthier Brière (gauthier.briere "at" gmail.com) */
 /*                                                                          */
-/* This file: tools.h is part of BeCG                                       */
+/* This file: tools.cpp is part of BeCG                                     */
 /*                                                                          */
 /* BeCG is free software: you can redistribute it and/or modify it          */
 /* under the terms of the GNU General Public License as published by        */
@@ -90,9 +90,19 @@ void getEepromStartupData(void) {
   EEPROM.get(ADDR_ENTRAXE, entraxe);  if (entraxe != entraxe) entraxe = DEFAULT_ENTAXE;
   EEPROM.get(ADDR_PAF_BA, pafBA);  if (pafBA != pafBA) pafBA = DEFAULT_PAF_BA;
   EEPROM.get(ADDR_MASSE_ETALON, masseEtalon);  if (masseEtalon != masseEtalon) masseEtalon = DEFAULT_MASSE_ETALON;
+  charTmp = char(EEPROM.read(ADDR_LANG));
+  if (charTmp != 0xFF) {
+    lang[0] = charTmp;
+    for (int i=1; i<LANG_LEN; i++) {
+      lang[i] = char(EEPROM.read(ADDR_LANG + i));
+    }
+  } else {
+    strcpy(lang, DEFAULT_LANG);
+  }
 
   #ifdef DEBUG
     Serial.printf("EEPROM_Version......... = %s\n", EEPROM_Version);
+    Serial.printf("LANG................... = %s\n", lang);
     Serial.printf("scaleBA................ = %f\n", scaleBA);
     Serial.printf("scaleBF................ = %f\n", scaleBF);
     Serial.printf("pafBA.................. = %f\n", pafBA);
@@ -173,22 +183,22 @@ void tare(void) {
   // Tarage (remise à zéro) de la balance
 
   #ifdef DEBUG
-    Serial.printf("Remise à zero balances...\n");
+    Serial.printf("Remise à zéro balances...\n");
   #endif
 
   if (hx711_ba.wait_ready_timeout(1000)) {
-    afficheMessage("\n   Remise \x85 zero\n   balance BA...");
+    afficheMessage("\n   Remise à zéro\n   balance BA...");
     #ifdef DEBUG
       Serial.printf("Remise à zero balance BA...\n");
     #endif
     hx711_ba.tare(15); // Remise à zero de balance bord d'attaque
   }
   if (hx711_ba.wait_ready_timeout(1000)) {
-    afficheMessage("\n   Remise \x85 zero\n   balance BF...");
+    afficheMessage("\n   Remise à zéro\n   balance BF...");
     #ifdef DEBUG
-      Serial.printf("Remise à zero balance BF...\n");
+      Serial.printf("Remise à zéro balance BF...\n");
     #endif
-    hx711_bf.tare(15); // Remise à zero de balance bord de fuite
+    hx711_bf.tare(15); // Remise à zéro de balance bord de fuite
   }
 
   filter_ba.reset(); // Reset filtre de Kalman BA
@@ -259,7 +269,7 @@ void etalonnage(void) {
   waitForTareButton();
   
   // Reset valeurs balances
-  afficheMessage("Remise \x85 z\x82ro\ndes balances...");
+  afficheMessage("Remise à zéro\ndes balances...");
   #ifdef DEBUG
     Serial.printf("Remise à zero balances...\n");
   #endif
@@ -269,7 +279,7 @@ void etalonnage(void) {
   hx711_bf.tare();
 
   // Tarrage bord d'attaque
-  sprintf(msgBuffer, "Placez une masse de\n%dg sur la balance\ncot\x82 bord d'attaque,\npuis pressez \"Tare\"", masseEtalon);
+  sprintf(msgBuffer, "Placez une masse de\n%dg sur la balance\ncoté bord d'attaque,\npuis pressez \"Tare\"", masseEtalon);
   afficheMessage(msgBuffer);
   #ifdef DEBUG
     Serial.printf("Placez une masse de %dg sur la balance coté bord d'attaque, puis appuyez sur \"Tare\"\n", masseEtalon);
@@ -283,7 +293,7 @@ void etalonnage(void) {
   hx711_ba.set_scale(masse_ba/masseEtalon);
 
   // Tarrage bord de fuite
-  sprintf(msgBuffer, "Placez une masse de\n%dg sur la balance\ncot\x82 bord de fuite,\npuis pressez \"Tare\"", masseEtalon);
+  sprintf(msgBuffer, "Placez une masse de\n%dg sur la balance\ncoté bord de fuite,\npuis pressez \"Tare\"", masseEtalon);
   afficheMessage(msgBuffer);
   #ifdef DEBUG
     Serial.printf("Placez une masse de %dg sur la balance coté bord de fuite, puis appuyez sur \"Tare\"\n", masseEtalon);
@@ -304,7 +314,7 @@ void etalonnage(void) {
   EEPROM.put(ADDR_SCALE_BF, scale_bf);
   EEPROM.commit();
 
-  sprintf(msgBuffer, "Etalonnage termin\x82,\nscale_ba = %f\nscale_bf = %f", scale_ba, scale_bf);
+  sprintf(msgBuffer, "Etalonnage terminé,\nscale_ba = %f\nscale_bf = %f", scale_ba, scale_bf);
   afficheMessage(msgBuffer);
   #ifdef DEBUG
     Serial.printf("Etalonnage terminé, scale_ba = %f, scale_bf = %f\n", scale_ba, scale_bf);
@@ -317,7 +327,7 @@ void etalonnage(void) {
 }
 
   void resetFactory(void) {
-  // Reset de tous les paramètres à leur valeur par défaut
+  // Reset de tous les paramètres à leur valeur par défaut et reinitialisation EEPROM
 
   #ifdef DEBUG
     Serial.printf("Entrée dans resetFactory()\n");
@@ -329,6 +339,7 @@ void etalonnage(void) {
   strcpy(cli_pwd,  DEFAULT_CLI_PWD);
   strcpy(ap_ssid,  DEFAULT_AP_SSID);
   strcpy(ap_pwd,   DEFAULT_AP_PWD);
+  strcpy(lang, DEFAULT_LANG);
   String SSID_MAC = String(DEFAULT_AP_SSID + WiFi.softAPmacAddress().substring(9));
   SSID_MAC.toCharArray(ap_ssid, MAX_SSID_LEN);
   entraxe     = DEFAULT_ENTAXE;
@@ -360,7 +371,9 @@ void etalonnage(void) {
   EEPROM.put(ADDR_ENTRAXE, entraxe);
   EEPROM.put(ADDR_PAF_BA, pafBA);
   EEPROM.put(ADDR_MASSE_ETALON, masseEtalon);
-  
+
+  EEPROM_writeStr(ADDR_LANG, lang, LANG_LEN);
+
   #ifdef DEBUG
     Serial.printf("  EEPROM.commit()\n");
   #endif
@@ -413,50 +426,4 @@ String macToString(const unsigned char* mac) {
   char buf[20];
   snprintf(buf, sizeof(buf), "%02x:%02x:%02x:%02x:%02x:%02x", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
   return String(buf);
-}
-
-// Formate une chaine de caractère utf8 et caractères 
-// d'échappement pour affichage sur SSD1306 en CP437
-String formateCP437(String utf8) {
-  String tmpString = "";
-  String tmpChar = "";
-  int i;
-  int len;
-  
-  /*
-  tmpString = utf8.replace("à", "\x85").replace("é", "\x82").replace("è", "\x8A");
-  */
-  
-  len = utf8.length();
-  for (i=0; i<len; i++) {
-    tmpChar = utf8[i];
-    if (tmpChar == "à") {
-      tmpString += '\x85';
-    } else if (tmpChar == "é") {
-      tmpString += '\x82';
-    } else if (tmpChar == "ê") {
-      tmpString += '\x88';
-    } else if (tmpChar == "ë") {
-      tmpString += '\x89';
-    } else if (tmpChar == "è") {
-      tmpString += '\x8A';
-    } else if (tmpChar == "ç") {
-      tmpString += '\x87';
-    } else if (tmpChar == "\\") {
-      i++;
-      tmpChar = utf8[i];
-      if (tmpChar == "n") {
-        tmpString += '\n';
-      } else if (tmpChar == "t") {
-        tmpString += '\t';
-      } else if (tmpChar == "\\") {
-        tmpString += '\\';
-      }
-    } else {
-      tmpString += tmpChar;
-    }
-  }
-
-  return tmpString;
-  
 }

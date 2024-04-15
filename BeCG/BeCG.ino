@@ -27,6 +27,7 @@
 //----------------------------------------------------------------------------
 
 char EEPROM_Version[EEPROM_VERSION_LEN];
+char lang[LANG_LEN + 1];
 
 // Capteurs de masse
 HX711 hx711_ba;
@@ -186,9 +187,9 @@ void loop() {
         #endif
         etalonnage(); // Etalonnages avec une masse connue...
       } else {
-        afficheMessage("\n   Remise \x85 z\x82ro\n   balances...");
+        afficheMessage("\n   Remise à zéro\n   balances...");
         #ifdef DEBUG
-          Serial.printf("Remise à z\x82ro balances.\n");
+          Serial.printf("Remise à zéro balances.\n");
         #endif
         tare();
       }

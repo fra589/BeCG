@@ -100,6 +100,7 @@ void wifiClientInit(void) {
   
   // Empeche le wifi client de se connecter avec d'anciens paramètres résiduels en flash.
   WiFi.setAutoConnect(false);
+  WiFi.setAutoReconnect (false );
   // Connexion à un Acces Point si SSID défini
   if (cli_ssid[0] != '\0') {
     #ifdef DEBUG

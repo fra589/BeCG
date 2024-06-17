@@ -46,5 +46,7 @@
   void handleNotFound(void);
   void handleReboot(void);
   void handleUpdate(void);
+  void handleFSInfo(void);
+  String getFileList(String path);
 
 #endif

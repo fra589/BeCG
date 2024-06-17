@@ -1,0 +1,12 @@
+Commande pour sauvegarder l'image complette 
+esptool --chip auto --port /dev/ttyUSB1 --baud 115200 read_flash 0x00000 0x400000 backup.img
+mv backup.img BeCG_vX.X.XXXXXXXX.bin
+
+Commande pour restaurer sur un autre :
+esptool --port /dev/ttyUSB1 write_flash -fm qio 0x0 backup.img
+
+Pour créer l'image LittleFS à upoader :
+mklittlefs -c /home/gauthier/src/BeCG/BeCG/data -s 2072576 -p 256 -b 8192 /home/gauthier/src/BeCG/builds/BeCG_data.bin
+
+Upload littlefs:
+esptool --port /dev/ttyUSB1 write_flash -fm qio 0x200000 /home/gauthier/src/BeCG/builds/BeCG_data.bin

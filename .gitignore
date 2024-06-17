@@ -4,8 +4,10 @@ no_git
 *.o
 *.bin
 *.FCStd1
-build
-builds
+*_old
+BeCG/build/*
+!vide.txt
 doc
 ssd1306-1.8.3
 HX711_Arduino_Library
+releases/*.bin

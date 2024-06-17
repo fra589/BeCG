@@ -81,8 +81,9 @@ void setup() {
   #if defined(DEBUG) || defined(DEBUG2) || defined(DEBUG_WEB) || defined(DEBUG_WEB_VALUE)
     // Init port série pour debug
     Serial.begin(115200);
-    delay(500);
-    Serial.println("");
+    Serial.setDebugOutput(true);
+    Serial.flush();
+    Serial.println();
     Serial.flush();
   #endif
 

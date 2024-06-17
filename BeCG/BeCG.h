@@ -50,9 +50,9 @@
   #define COPYRIGHT             "G.Bri\x8Are 2023-2024"
   #define ORG_NAME              "fra589"
   #define APP_NAME              "BeCG"
-  #define APP_VERSION_MAJOR     "0"
-  #define APP_VERSION_MINOR     "9"
-  #define APP_VERSION_DATE      "20240227"
+  #define APP_VERSION_MAJOR     "1"
+  #define APP_VERSION_MINOR     "0"
+  #define APP_VERSION_DATE      "20240617"
   #define APP_VERSION_STRING    "v" APP_VERSION_MAJOR "." APP_VERSION_MINOR "." APP_VERSION_DATE
   #define APP_NAME_VERSION      APP_NAME " - " APP_VERSION_STRING "\0"
   #define EEPROM_VERSION_MAJOR  "0"

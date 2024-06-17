@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<!--
+/****************************************************************************/
+/*                                                                          */
+/* Copyright (C) 2023-2024 Gauthier Brière (gauthier.briere "at" gmail.com) */
+/*                                                                          */
+/* This file: settings.html is part of BeCG                                 */
+/*                                                                          */
+/* BeCG is free software: you can redistribute it and/or modify it          */
+/* under the terms of the GNU General Public License as published by        */
+/* the Free Software Foundation, either version 3 of the License, or        */
+/* (at your option) any later version.                                      */
+/*                                                                          */
+/* BeCG is distributed in the hope that it will be useful, but              */
+/* WITHOUT ANY WARRANTY; without even the implied warranty of               */
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            */
+/* GNU General Public License for more details.                             */
+/*                                                                          */
+/* You should have received a copy of the GNU General Public License        */
+/* along with this program.  If not, see <http://www.gnu.org/licenses/>.    */
+/*                                                                          */
+/****************************************************************************/
+-->
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width">
+    <meta name="description" content="Balance électronique pour mesure du Centre de Gravité des modèles réduits d'avion.">
+    <title>BeCG</title>
+    <link rel="shortcut icon" type="image/png" href="../favicon.svg" />
+    <link rel="stylesheet" media="screen" type="text/css" href="../style.css"/>
+    <script type="text/javascript" src="../scripts.js"></script>
+  </head>
+  <body onload="netconfig_onload()">
+    <input type="hidden" id="paf_ba" name="paf_ba" value="0.0" />
+    <input type="hidden" id="entraxe" name="entraxe" value="0.0" />
+    <input type="hidden" id="tare" name="tare" value="0" />
+	  <table id="entete">
+      <tbody>
+        <tr>
+          <td>
+            <div id="logo">
+              <img src="../BeCG-couleur.svg" />
+            </div>
+          </td>
+          <td>
+            <h2>
+              Balance électronique de CentraGe
+            </h2>
+          </td>
+          <td>
+            <div id="retour">
+              <a href="/" title="Retour">
+                <img src="../retour.svg" />
+              </a>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+	  <div id="la_page">
+      <h2>Configuration du réseau WiFi</h2>
+      <div id="reseauActuel">
+        <span id="span_deconnexion">
+          <button id="btnDeconnect" title="Se déconnecter du réseau" onclick="deconnect_clique()">
+            Déconnexion...
+          </button>
+        </span>
+        <p>
+          <label for="ssidActuel">Réseau en cours, SSID = </label>
+          <input type="text" name="ssidActuel" id="ssidActuel" value="" readonly />
+          <br />
+          <label for="ipActuel">Réseau en cours, IP = </label>
+          <input type="text" name="ipActuel" id="ipActuel" value="" readonly />
+        </p>
+      </div>
+      <br />
+      <hr />
+      <!--------------------------------------------------------------------->
+      <br />
+      <div id="networkTable">
+      </div>
+      <div style="float: left; margin-left: 18px;">
+        <a href="#" onclick="reboot()"><br />Redémarrer la balance</a>
+      </div>
+      <!--------------------------------------------------------------------->
+      <!-- Boutons annuler / valider -->
+      <!--------------------------------------------------------------------->
+      <p class="alignement-droit">
+        <button id="bouton_refresh" title="Raffraichir la liste des réseaux" onclick="get_networks()">
+          Raffraichir
+        </button>
+      </p>
+      <hr />
+      <!--------------------------------------------------------------------->
+      <p>
+        BeCG AP SSID = <span id="ap_ssid">BeCG_XX:XX:XX</span>&nbsp;---&nbsp;IP = <span id="ap_ip">0.0.0.0</span><br />
+        BeCG client SSID = <span id="cli_ssid">vide</span>&nbsp;---&nbsp;IP = <span id="cli_ip">0.0.0.0</span>
+      </p>
+    </div>  <!--id="la_page" -->
+    <hr />
+    <!--------------------------------------------------------------------->
+	  <div id="pied_de_page">
+      <p>
+        BeCG <span id="version">v0.0.00000000</span> - Copyright © Gauthier Brière (<a href="https://github.com/fra589/BeCG">fra589</a>) - 2023-2024
+      </p> <!--id="pied_de_page" -->
+    </div>
+    <!--------------------------------------------------------------------->
+    <!-- Eléments masqués -->
+    <!--------------------------------------------------------------------->
+    <div id="dlgMask0" class="dlgMask noshow">
+      <div id="dlgConnect" class="dialog masquer">
+        <div id="dlgContenu0" class="dlgPwdContenu">
+          <h2>Se connecter à un nouveau WiFi</h2>
+          <p>
+            <label for="ssid_input">Connexion au réseau : SSID = </label>
+            <input type="text" name="ssid_input" id="ssid_input" value="" readonly />
+            <br />
+            <label for="pwd_input">Entrez le mot de passe du réseau : </label>
+            <input type="password" name="pwd_input" id="pwd_input" value="" onkeyup="connect_keyup(event)" />
+          </p>
+        </div>
+        <p class="alignement-droit">
+          <button id="btnConnect" title="Se connecter au réseau" onclick="connect_clique()">
+            Connexion
+          </button>
+          &nbsp;
+          <button id="btnAnnuler" title="Fermer cette boite de dialogue" onclick="connect_cancel()">
+            Annuler
+          </button>
+        </p>
+      </div>
+      <div id="cadre_attente">
+        <div id="attente0" class="attente noshow"></div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,317 @@
+/****************************************************************************/
+/*                                                                          */
+/* Copyright (C) 2023-2024 Gauthier Brière (gauthier.briere "at" gmail.com) */
+/*                                                                          */
+/* This file: BeCG.ino is part of BeCG                                      */
+/*                                                                          */
+/* BeCG is free software: you can redistribute it and/or modify it          */
+/* under the terms of the GNU General Public License as published by        */
+/* the Free Software Foundation, either version 3 of the License, or        */
+/* (at your option) any later version.                                      */
+/*                                                                          */
+/* BeCG is distributed in the hope that it will be useful, but              */
+/* WITHOUT ANY WARRANTY; without even the implied warranty of               */
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            */
+/* GNU General Public License for more details.                             */
+/*                                                                          */
+/* You should have received a copy of the GNU General Public License        */
+/* along with this program.  If not, see <http://www.gnu.org/licenses/>.    */
+/*                                                                          */
+/****************************************************************************/
+:root {
+  /*font-family: sans-serif;*/
+  font-family: "Helvetica", "Arial", sans-serif;
+}
+body {
+  margin: 5px auto;
+  width: 100%;
+  min-width: 640px;
+  background-color: #d0ffe5;
+  text-align: center;
+}
+.alignement-droit {
+  margin-right: 10px;
+  text-align: right;
+}
+.alignement-gauche {
+  margin-left: 10px;
+  text-align: left;
+}
+.noshow {
+  display: none;
+}
+.masquer {
+  opacity: 0;
+}
+#entete {
+  width: 100%;
+}
+#logo {
+  float: left;
+  margin: 10px;
+  width: 128px;
+  height: 64px;
+}
+#settings {
+  float: right;
+  margin-left: 10px;
+  margin-right: 10px;
+  width: 64px;
+  height: 64px;
+}
+#retour {
+  float: right;
+  margin-left: 10px;
+  margin-right: 10px;
+  width: 64px;
+  height: 64px;
+}
+#retour img {
+  width: 100%;
+}
+h1 {
+  margin: 0;
+  text-align: center;
+  height: 64px;
+  padding-top: 17px;
+  padding-right: 10px
+}
+#la_page {
+  width: 100%;
+}
+#la_page h2 {
+  font-size: 1.5em;
+  margin: 0;
+}
+#la_page h3 {
+  font-size: 2.5em;
+  margin: 0;
+}
+#la_page p {
+  font-size: 1em;
+  margin: 0;
+}
+#la_page table {
+  width: 100%;
+}
+#image_setting {
+  margin-top: 30px;
+  margin-bottom:15px;
+}
+#heure {
+  /*text-align: left;*/
+}
+#la_page #btnSave {
+  width: 20em;
+  height: 3em;
+}
+#la_page button {
+  text-align: center;
+  margin-right: 10px;
+  margin-left: 10px;
+  width: 10em;
+  height: 4em;
+}
+#pied_de_page {
+  width: 100%;
+}
+.dlgMask {
+  position: fixed;
+  background-color: rgba(0,0,0,0.5);
+  left: 0%;
+  right: 0%;
+  top: 0%;
+  bottom: 0%;
+}
+.dialog {
+  display: inline-block;
+  position: fixed;
+  border: 1px solid;
+  background-color: rgba(224,224,224,1);
+  box-shadow: 8px 8px 12px #3f3f3f;
+  left: 10%;
+  right: 10%;
+  top: 15%;
+  height: 30%;
+  text-align: center;
+  transition: all 0.5s ease-in-out;
+  -moz-transition: all 0.5s ease-in-out;
+  -webkit-transition: all 0.5s ease-in-out;
+  -o-transition: all 0.5s ease-in-out;
+  -ms-transition: all 0.5s ease-in-out;
+}
+.dlgContenu {
+  margin: 15px;
+  height: 70%;
+  /*background-color: lightgreen;*/
+  font-size: 24px;
+}
+#cadre_attente {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+}
+.attente {
+  border: 7px solid #f3f3f3;
+  border-top: 7px solid yellow;
+  border-right: 12px solid green;
+  border-bottom: 16px solid blue;
+  border-left: 12px solid red;
+  border-radius: 50%;
+  width: 37px;
+  height: 37px;
+  animation: spin 1.2s linear infinite;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+#balance_config {
+  padding-bottom: 30px;
+  text-align: left;
+}
+#balance_config input[type=number] {
+  margin-bottom: 3px;
+  text-align: right;
+}
+#balance_config label {
+  margin-left: 18px;
+  width: 15em;
+  display: inline-block;
+}
+#reseauActuel  {
+  text-align: left;
+}
+#reseauActuel input {
+  margin-bottom: 3px;
+  text-align: center;
+}
+#reseauActuel label {
+  margin-left: 18px;
+  width: 13em;
+  display: inline-block;
+}
+.netTables {
+  border-spacing: 2px;
+}
+.trlink {
+  cursor: pointer;
+  background-color: skyblue;
+  height: 40px;
+}
+.centreVertical {
+  vertical-align: bottom;
+}
+#span_deconnexion {
+  float: right;
+  margin-right: 10px;
+}
+.dlgPwdContenu {
+  margin: 15px;
+  height: 70%;
+  /*background-color: lightgreen;*/
+  font-size: 12px;
+}
+.dlgPwdContenu label {
+  display: inline-block;
+  width: 17em;
+  text-align: left;
+  margin-top: 15px;
+  margin-bottom: 10px;
+}
+.dlgPwdContenu input {
+  width: 15em;
+}
+#ssid_input {
+  margin-top: 20px;
+  text-align: center;
+}
+#onglets {
+  text-align: left;
+  padding-left: 20px;
+  margin-bottom: 10px;
+}
+.onglet {
+  font-size: 1.5em;
+  text-align: center;
+  padding-top: 3px;
+  padding-left: 17px;
+  padding-right: 17px;
+  padding-bottom: 3px;
+  background: lightgray;
+  border-radius: 7px 7px 0px 0px;
+  cursor: pointer;
+}
+.onglet.selected {
+  background: green;
+}
+.flag {
+  float: right;
+  font-size: 1.5em;
+  text-align: center;
+  padding-top: 3px;
+  padding-right: 10px;
+  padding-bottom: 3px;
+}
+.flag img {
+  width: 36px;
+  height: 24px;
+  border-style: solid;
+  border-width: 3px;
+  border-color: lightgray;
+  border-radius: 3px;
+  cursor: pointer;
+}
+#flag_actif {
+  border-color: green;
+  cursor: auto;
+}
+#mesures {
+  height: 555px;
+}
+#calculs {
+  height: 555px;
+}
+#calculs h2 {
+  margin-bottom: 20px;
+}
+#calculs p {
+  text-align: left;
+  margin: 20px
+}
+#calculs label {
+  width: 15em;
+  display: inline-block;
+}
+#calculs input[type=number] {
+  margin-bottom: 7px;
+  text-align: right;
+}
+#spanApropos {
+  display: inline-block;
+  vertical-align: bottom;
+  /*margin-right: 95px;*/
+  cursor: pointer;
+  color: darkblue;
+  text-decoration: underline;
+}
+#dlgApropos {
+  height: auto;
+}
+#imgApropos {
+  float: left;
+  height: 64px;
+}
+#apropos_version {
+  text-align: left;
+  vertical-align: bottom;
+  display: table-cell;
+  height: 64px;
+  font-size: 1.5em;
+  padding-left: 0.5em;
+}
+#btnClose1 {
+  margin-right: 12px;
+}
+

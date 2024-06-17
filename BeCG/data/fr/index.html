@@ -1,197 +1,24 @@
-<!DOCTYPE html>
-<!--
-/****************************************************************************/
-/*                                                                          */
-/* Copyright (C) 2023-2024 Gauthier Brière (gauthier.briere "at" gmail.com) */
-/*                                                                          */
-/* This file: index.html is part of BeCG                                    */
-/*                                                                          */
-/* BeCG is free software: you can redistribute it and/or modify it          */
-/* under the terms of the GNU General Public License as published by        */
-/* the Free Software Foundation, either version 3 of the License, or        */
-/* (at your option) any later version.                                      */
-/*                                                                          */
-/* BeCG is distributed in the hope that it will be useful, but              */
-/* WITHOUT ANY WARRANTY; without even the implied warranty of               */
-/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            */
-/* GNU General Public License for more details.                             */
-/*                                                                          */
-/* You should have received a copy of the GNU General Public License        */
-/* along with this program.  If not, see <http://www.gnu.org/licenses/>.    */
-/*                                                                          */
-/****************************************************************************/
--->
-<html lang="fr">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width">
-    <meta name="description" content="Balance électronique pour mesure du Centre de Gravité des modèles réduits d'avion.">
-    <title>BeCG</title>
-    <link rel="shortcut icon" type="image/png" href="../favicon.svg" />
-    <link rel="stylesheet" media="screen" type="text/css" href="../style.css"/>
-    <script type="text/javascript" src="../scripts.js"></script>
-  </head>
-  <body onload="index_onload()">
-    <input type="hidden" id="paf_ba" name="paf_ba" value="0.0" />
-    <input type="hidden" id="entraxe" name="entraxe" value="0.0" />
-    <input type="hidden" id="tare" name="tare" value="0" />
-	  <table id="entete">
-      <tbody>
-        <tr>
-          <td>
-            <div id="logo">
-              <img src="../BeCG-couleur.svg" />
-            </div>
-          </td>
-          <td>
-            <h2>
-              Balance électronique de CentraGe
-            </h2>
-          </td>
-          <td>
-            <div id="settings">
-              <a href="./settings.html" title="Configurer la balance...">
-                <img src="../settings.svg" />
-              </a>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-	  <div id="la_page">
-      <div id="onglets">
-        <span id="onglet1" class="onglet selected" onclick="onglet_click('onglet1')">Mesures</span>
-        <span id="onglet2" class="onglet" onclick="onglet_click('onglet2')">Calculs</span>
-        <span id="flag_en" class="flag"><img src="../flag_en.svg" onclick="changeLang()" /></span>
-        <span id="flag_fr" class="flag"><img src="../flag_fr.svg" id="flag_actif" /></span>
-      </div>
-      <div id="mesures">
-        <h2>Masses mesurées</h2>
-        <p>
-          <table>
-            <thead>
-              <tr>
-                <th>bord d'attaque</th>
-                <th>bord de fuite</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td id="ba">0.0 g</td>
-                <td id="bf">0.0 g</td>
-              </tr>
-            </tbody>
-          </table>
-        </p>
-        <h2>
-          Masse totale
-        </h2>
-        <h3 id="total">0.0 g</h3>
-        <p>
-          &nbsp;
-        </p>
-        <h2>
-          Position Centre de Gravité
-        </h2>
-        <h3 id="cg">~~~~</h3>
-        <p>
-          <img src="../profil.svg" />
-        </p>
-        <div style="float: left;">
-          <input type="checkbox" id="auto_refresh" name="auto_refresh" onclick="autoRefresh()" checked="checked" />
-          <label for="auto_refresh">Auto refresh</label>
-        </div>
-        <!--------------------------------------------------------------------->
-        <!-- Boutons tare / étalonnage -->
-        <!--------------------------------------------------------------------->
-        <p class="alignement-droit">
-          <span id="spanApropos" onclick="showApropos()">A propos de BeCG...</span>
-          <button id="bouton_tare" title="Remise à zéro" onclick="balance_tare()">
-            Tare
-          </button>
-          &nbsp;
-          <button id="bouton_etalonage" title="Etalonner la balance..." onclick="afficheDialog('dlgEtalonnage')">
-            Etalonnage
-          </button>
-        </p>
-      </div> <!-- id="mesures" -->
-      <div id="calculs" class="noshow">
-        <h2>Calculs lest de centrage</h2>
-        <p>
-          <label for="cg_mesure">Position CG mesurée (mm/ba)</label>
-          <input type="number" id="cg_mesure" name="cg_mesure" lang="en" value="0.0" readonly />
-          <br />
-          <label for="masse_mesure">Masse mesurée (g)</label>
-          <input type="number" id="masse_mesure" name="masse_mesure" lang="en" value="0.0" readonly />
-          <br /><br />
-          <label for="cg_voulu">Position CG désirée (mm/ba)</label>
-          <input type="number" id="cg_voulu" name="cg_voulu" value="0.0" lang="en" step="0.1"/>
-          <span id="info_cg_voulu">&nbsp;</span>
-          <br />
-          <label for="masse_lest">Masse du lest (g)</label>
-          <input type="number" id="masse_lest" name="masse_lest" value="0.0" lang="en"  step="0.1"/>
-          <span id="info_masse_lest">&nbsp;</span>
-          <br />
-          <label for="levier_lest">Bras de levier du lest (mm/ba)</label>
-          <input type="number" id="levier_lest" name="levier_lest" value="0.0" lang="en"  step="0.1"/>
-          <span id="info_levier_lest">&nbsp;</span>
-          <br /><br />
-          <i>(Bras de levier du lest : mesuré à partir du bord d'attaque, valeurs positives en arrière du bord d'attaque et négatives en avant.)</i>
-        </p>
-        <div>
-          <button id="btnSave" onclick = "sauvegarder()">Sauvegarder au format CSV...</button>
-        </div>
-      </div>  <!-- id="calculs" -->
-    </div> <!-- id="la_page" -->
-      <p id="heure" class="noshow">&nbsp;</p>
-    <hr />
-      <p>
-        BeCG AP SSID = <span id="ap_ssid">BeCG_XX:XX:XX</span>&nbsp;---&nbsp;IP = <span id="ap_ip">0.0.0.0</span><br />
-        BeCG client SSID = <span id="cli_ssid">vide</span>&nbsp;---&nbsp;IP = <span id="cli_ip">0.0.0.0</span>
-      </p>
-    <hr />
-	  <div id="pied_de_page">
-      <p>
-        BeCG <span id="version">v0.0.00000000</span> - Copyright © Gauthier Brière (<a href="https://github.com/fra589/BeCG">fra589</a>) - 2023-2024
-      </p>
-    </div>
-    <!-- Dialogue étalonnage -->
-    <div id="dlgMask0" class="dlgMask noshow">
-      <div id="dlgEtalonnage" class="dialog masquer">
-        <div id="dlgContenu0" class="dlgContenu">
-          &nbsp;
-        </div>
-        <p class="alignement-droit">
-          <button id="btnSuite" title="Continuer" onclick="suite_clique()">
-            Suivant
-          </button>
-          <button id="btnClose" title="Fermer cette boite de dialogue" onclick="closeDialog('dlgEtalonnage')">
-            Fermer
-          </button>
-        </p>
-      </div>
-      <div id="cadre_attente">
-       <div id="attente0" class="attente noshow"></div>
-      </div>
-    </div> <!-- dlgMask0 -->
-    <div id="dlgMask1" class="dlgMask noshow">
-      <div id="dlgApropos" class="dialog masquer">
-        <div id="dlgContenu1" class="dlgContenu">
-          <span id="imgApropos"><img src="../BeCG-couleur.svg" /></span><span id="apropos_version">v0.0.00000000</span>
-          <p style="text-align: left;">
-            Balance électronique pour mesure et positionnement du Centre de Gravité des modèles réduits d'avion.
-          </p>
-          <p>
-            Copyright © Gauthier Brière (<a href="https://github.com/fra589/BeCG">fra589</a>) - 2023-2024
-          </p>
-        </div> <!-- dlgContenu1 -->
-        <p class="alignement-droit">
-          <button id="btnClose1" title="Fermer" onclick="closeApropos()">
-            Fermer
-          </button>
-        </p>
-      </div> <!-- dlgApropos -->
-    </div> <!-- dlgMask1 -->
-  </body>
-</html>
-
+<!doctype html><html lang=fr><meta charset=utf-8><meta name=viewport content="width=device-width"><meta name=description content="Balance électronique pour mesure du Centre de Gravité des modèles réduits d'avion."><title>BeCG</title><link rel="shortcut icon" type=image/png href=../favicon.svg><link rel=stylesheet media=screen href=../style.css><script src=../scripts.js></script><body onload=index_onload()><input type=hidden id=paf_ba name=paf_ba value=0.0>
+<input type=hidden id=entraxe name=entraxe value=0.0>
+<input type=hidden id=tare name=tare value=0><table id=entete><tbody><tr><td><div id=logo><img src=../BeCG-couleur.svg></div><td><h2>Balance électronique de CentraGe</h2><td><div id=settings><a href=./settings.html title="Configurer la balance..."><img src=../settings.svg></a></div></table><div id=la_page><div id=onglets><span id=onglet1 class="onglet selected" onclick="onglet_click('onglet1')">Mesures</span>
+<span id=onglet2 class=onglet onclick="onglet_click('onglet2')">Calculs</span>
+<span id=flag_en class=flag><img src=../flag_en.svg onclick=changeLang()></span>
+<span id=flag_fr class=flag><img src=../flag_fr.svg id=flag_actif></span></div><div id=mesures><h2>Masses mesurées</h2><p><table><thead><tr><th>bord d'attaque<th>bord de fuite<tbody><tr><td id=ba>0.0 g<td id=bf>0.0 g</table><h2>Masse totale</h2><h3 id=total>0.0 g</h3><p>&nbsp;<h2>Position Centre de Gravité</h2><h3 id=cg>~~~~</h3><p><img src=../profil.svg><div style=float:left><input type=checkbox id=auto_refresh name=auto_refresh onclick=autoRefresh() checked>
+<label for=auto_refresh>Auto refresh</label></div><p class=alignement-droit><span id=spanApropos onclick=showApropos()>A propos de BeCG...</span>
+<button id=bouton_tare title="Remise à zéro" onclick=balance_tare()>
+Tare</button>
+&nbsp;
+<button id=bouton_etalonage title="Etalonner la balance..." onclick="afficheDialog('dlgEtalonnage')">
+Etalonnage</button></div><div id=calculs class=noshow><h2>Calculs lest de centrage</h2><p><label for=cg_mesure>Position CG mesurée (mm/ba)</label>
+<input type=number id=cg_mesure name=cg_mesure lang=en value=0.0 readonly><br><label for=masse_mesure>Masse mesurée (g)</label>
+<input type=number id=masse_mesure name=masse_mesure lang=en value=0.0 readonly><br><br><label for=cg_voulu>Position CG désirée (mm/ba)</label>
+<input type=number id=cg_voulu name=cg_voulu value=0.0 lang=en step=0.1>
+<span id=info_cg_voulu>&nbsp;</span><br><label for=masse_lest>Masse du lest (g)</label>
+<input type=number id=masse_lest name=masse_lest value=0.0 lang=en step=0.1>
+<span id=info_masse_lest>&nbsp;</span><br><label for=levier_lest>Bras de levier du lest (mm/ba)</label>
+<input type=number id=levier_lest name=levier_lest value=0.0 lang=en step=0.1>
+<span id=info_levier_lest>&nbsp;</span><br><br><i>(Bras de levier du lest : mesuré à partir du bord d'attaque, valeurs positives en arrière du bord d'attaque et négatives en avant.)</i><div><button id=btnSave onclick=sauvegarder()>Sauvegarder au format CSV...</button></div></div></div><p id=heure class=noshow>&nbsp;<hr><p>BeCG AP SSID = <span id=ap_ssid>BeCG_XX:XX:XX</span>&nbsp;---&nbsp;IP = <span id=ap_ip>0.0.0.0</span><br>BeCG client SSID = <span id=cli_ssid>vide</span>&nbsp;---&nbsp;IP = <span id=cli_ip>0.0.0.0</span><hr><div id=pied_de_page><p>BeCG <span id=version>v0.0.00000000</span> - Copyright © Gauthier Brière (<a href=https://github.com/fra589/BeCG>fra589</a>) - 2023-2024</div><div id=dlgMask0 class="dlgMask noshow"><div id=dlgEtalonnage class="dialog masquer"><div id=dlgContenu0 class=dlgContenu>&nbsp;</div><p class=alignement-droit><button id=btnSuite title=Continuer onclick=suite_clique()>
+Suivant</button>
+<button id=btnClose title="Fermer cette boite de dialogue" onclick="closeDialog('dlgEtalonnage')">
+Fermer</button></div><div id=cadre_attente><div id=attente0 class="attente noshow"></div></div></div><div id=dlgMask1 class="dlgMask noshow"><div id=dlgApropos class="dialog masquer"><div id=dlgContenu1 class=dlgContenu><span id=imgApropos><img src=../BeCG-couleur.svg></span><span id=apropos_version>v0.0.00000000</span><p style=text-align:left>Balance électronique pour mesure et positionnement du Centre de Gravité des modèles réduits d'avion.<p>Copyright © Gauthier Brière (<a href=https://github.com/fra589/BeCG>fra589</a>) - 2023-2024</div><p class=alignement-droit><button id=btnClose1 title=Fermer onclick=closeApropos()>
+Fermer</button></div></div>

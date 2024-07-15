@@ -150,11 +150,13 @@ void balancesInit(void) {
     } else {
       hx711_ba.set_scale(DEFAULT_SCALE_BA);
     }
+    hx711_ba.tare(10); // Remise à zero de balance bord d'attaque
     if (scaleBF != 0.0) {
       hx711_bf.set_scale(scaleBF);
     } else {
-      hx711_ba.set_scale(DEFAULT_SCALE_BA);
+      hx711_bf.set_scale(DEFAULT_SCALE_BF);
     }
+    hx711_bf.tare(10); // Remise à zéro de balance bord de fuite
     delay(250);
     yield();
     #ifdef DEBUG

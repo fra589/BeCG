@@ -32,7 +32,7 @@
   void affichage_init(void);
   void clearDisplay(void);
   void afficheSplash(void);
-  void afficheMessage(const char *message);
+  void afficheMessage(const char *message, ...);
   int  afficheDigit(int digit);
   void afficheMasse_BA_BF(float masseBA, float MasseBF);
   void afficheMasseTotale(float masseTotale);

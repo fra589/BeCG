@@ -35,24 +35,24 @@
   
   #define TRANSLATIONS {                                                                      \
     {                                                                                         \
-      "\n Remise à zéro\n balances...",                                                       \
-      "\n Remise à zéro\n balances...",                                                       \
-      "\n Reseting\n scales..."                                                               \
+      "\n   Remise à zéro\n   balances...",                                                   \
+      "\n   Remise à zéro\n   balances...",                                                   \
+      "\n   Reseting\n   scales..."                                                           \
     },                                                                                        \
     {                                                                                         \
-      "\n Erreur capteur\n de masse !",                                                       \
-      "\n Erreur capteur\n de masse !",                                                       \
-      "\n Mass sensor\n error!"                                                               \
+      "\n   Erreur capteur\n   de masse !",                                                   \
+      "\n   Erreur capteur\n   de masse !",                                                   \
+      "\n   Mass sensor\n   error!"                                                           \
     },                                                                                        \
     {                                                                                         \
-      "\n Remise à zéro\n balance BA...",                                                     \
-      "\n Remise à zéro\n balance BA...",                                                     \
-      "\n Reseting\n LE scales..."                                                            \
+      "\n   Remise à zéro\n   balance BA...",                                                 \
+      "\n   Remise à zéro\n   balance BA...",                                                 \
+      "\n   Reseting\n   LE scale..."                                                        \
     },                                                                                        \
     {                                                                                         \
-      "\n Remise à zéro\n balance BF...",                                                     \
-      "\n Remise à zéro\n balance BF...",                                                     \
-      "\n Reseting\n TE scales..."                                                            \
+      "\n   Remise à zéro\n   balance BF...",                                                 \
+      "\n   Remise à zéro\n   balance BF...",                                                 \
+      "\n   Reseting\n   TE scale..."                                                        \
     },                                                                                        \
     {                                                                                         \
       "Mesure de la tare\nbord d'attaque...",                                                 \
@@ -77,12 +77,12 @@
     {                                                                                         \
       "Placez une masse de\n%dg sur la balance\ncoté bord d'attaque,\npuis pressez \"Tare\"", \
       "Placez une masse de\n%dg sur la balance\ncoté bord d'attaque,\npuis pressez \"Tare\"", \
-      "Place a mass of\n%dg on the scale on\nthe Leading edge side,\nthen press \"Tare\""     \
+      "Place a mass of\n%dg on the scale on\nLeading Edge side,\nthen press \"Tare\""     \
     },                                                                                        \
     {                                                                                         \
       "Placez une masse de\n%dg sur la balance\ncoté bord de fuite,\npuis pressez \"Tare\"",  \
       "Placez une masse de\n%dg sur la balance\ncoté bord de fuite,\npuis pressez \"Tare\"",  \
-      "Place a mass of\n%dg on the scale on\nthe Trailing edge side,\nthen press \"Tare\""    \
+      "Place a mass of\n%dg on the scale on\nTrailing Edge side,\nthen press \"Tare\""    \
     },                                                                                        \
     {                                                                                         \
       "Etalonnage terminé,\nscale_ba = %f\nscale_bf = %f",                                    \

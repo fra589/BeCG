@@ -118,7 +118,13 @@ void handleRoot(void) {
     Serial.println("captivePortal() returned false, sending index.html");
   #endif
 
+  /*
   handleFileRead("/" + String(lang) + "/index.html");
+  */
+  // Redirige vers la page index en fonction de la langue
+  server.sendHeader("Location", String("http://") + IPtoString(server.client().localIP()) + "/" + String(lang) + "/index.html", true);
+  server.send(302, "text/plain", "");   // Empty content inhibits Content-length header so we have to close the socket ourselves.
+  server.client().stop(); // Stop is needed because we sent no content length
 
 }
 
@@ -928,7 +934,10 @@ void handleSetLang(void) {
       if ((server.arg(i) == "fr") || (server.arg(i) == "en")) {
         if (strncmp(server.arg(i).c_str(), lang, (size_t)LANG_LEN) != 0) {
           // changement de langue
-          strcpy(lang, server.arg(i).c_str());
+          #ifdef DEBUG_WEB
+            Serial.printf("  Activation de la langue : %s\n", server.arg(i).c_str());
+          #endif
+          strncpy(lang, server.arg(i).c_str(), LANG_LEN);
           settingChange = true;
         }
       }
@@ -940,6 +949,11 @@ void handleSetLang(void) {
     EEPROM_writeStr(ADDR_LANG, lang, LANG_LEN);
     EEPROM.commit();
   }
+
+  // Redirige vers la page index en fonction de la langue
+  server.sendHeader("Location", String("http://") + IPtoString(server.client().localIP()) + "/" + String(lang) + "/index.html", true);
+  server.send(302, "text/plain", "");   // Empty content inhibits Content-length header so we have to close the socket ourselves.
+  server.client().stop(); // Stop is needed because we sent no content length
 
 }
 

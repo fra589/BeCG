@@ -20,6 +20,7 @@
 /****************************************************************************/
 
 #include "BeCG.h"
+#include <stdarg.h>
 
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 int _affichage_OK = 0;
@@ -69,20 +70,30 @@ void clearDisplay(void) {
 
 
 // Efface l'écran et affiche le message passé en argument
-void afficheMessage(const char *message) {
+void afficheMessage(const char *message, ...) {
+
+  va_list ap;
+  char msgBuffer[169];
+
+  // récupération des arguments optionels
+  va_start(ap, message);
 
   // Traduction du message
   char* msg = tr(lang, message);
 
+  // Fusion avec les argument optionels
+  vsprintf(msgBuffer, msg, ap);
+
   #ifdef DEBUG
-    Serial.printf("Message traduit : %s\n", msg);
+    Serial.printf("Message initial : %s\n", message);
+    Serial.printf("Message traduit : %s\n", msgBuffer);
   #endif
 
   // Conversion des accents utf8 en CP437
   // (la librairie Adafruit_SSD1306 ne connait que CP437)
   // A voir ici pour conversion UTF8 -> GFX Latin 1 (CP437)
   // https://www.sigmdel.ca/michel/program/misc/gfxfont_8bit_fr.html
-  String tmpString = msg;
+  String tmpString = msgBuffer;
   tmpString.replace("à", "\x85");
   tmpString.replace("é", "\x82");
   tmpString.replace("è", "\x8A");

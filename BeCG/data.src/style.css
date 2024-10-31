@@ -259,13 +259,15 @@ h1 {
   height: 24px;
   border-style: solid;
   border-width: 3px;
-  border-color: lightgray;
   border-radius: 3px;
   cursor: pointer;
 }
-#flag_actif {
+.flag_inactif {
+  border-color: lightgray;
+}
+.flag_actif {
   border-color: green;
-  cursor: auto;
+  /*cursor: auto;*/
 }
 #mesures {
   height: 555px;

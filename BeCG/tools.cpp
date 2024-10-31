@@ -150,11 +150,13 @@ void balancesInit(void) {
     } else {
       hx711_ba.set_scale(DEFAULT_SCALE_BA);
     }
+    hx711_ba.tare(10); // Remise à zero de balance bord d'attaque
     if (scaleBF != 0.0) {
       hx711_bf.set_scale(scaleBF);
     } else {
-      hx711_ba.set_scale(DEFAULT_SCALE_BA);
+      hx711_bf.set_scale(DEFAULT_SCALE_BF);
     }
+    hx711_bf.tare(10); // Remise à zéro de balance bord de fuite
     delay(250);
     yield();
     #ifdef DEBUG
@@ -279,8 +281,11 @@ void etalonnage(void) {
   hx711_bf.tare();
 
   // Tarrage bord d'attaque
+  /*
   sprintf(msgBuffer, "Placez une masse de\n%dg sur la balance\ncoté bord d'attaque,\npuis pressez \"Tare\"", masseEtalon);
   afficheMessage(msgBuffer);
+  */
+  afficheMessage("Placez une masse de\n%dg sur la balance\ncoté bord d'attaque,\npuis pressez \"Tare\"", masseEtalon);
   #ifdef DEBUG
     Serial.printf("Placez une masse de %dg sur la balance coté bord d'attaque, puis appuyez sur \"Tare\"\n", masseEtalon);
   #endif
@@ -293,8 +298,11 @@ void etalonnage(void) {
   hx711_ba.set_scale(masse_ba/masseEtalon);
 
   // Tarrage bord de fuite
+  /*
   sprintf(msgBuffer, "Placez une masse de\n%dg sur la balance\ncoté bord de fuite,\npuis pressez \"Tare\"", masseEtalon);
   afficheMessage(msgBuffer);
+  */
+  afficheMessage("Placez une masse de\n%dg sur la balance\ncoté bord de fuite,\npuis pressez \"Tare\"", masseEtalon);
   #ifdef DEBUG
     Serial.printf("Placez une masse de %dg sur la balance coté bord de fuite, puis appuyez sur \"Tare\"\n", masseEtalon);
   #endif
@@ -314,8 +322,11 @@ void etalonnage(void) {
   EEPROM.put(ADDR_SCALE_BF, scale_bf);
   EEPROM.commit();
 
+  /*
   sprintf(msgBuffer, "Etalonnage terminé,\nscale_ba = %f\nscale_bf = %f", scale_ba, scale_bf);
   afficheMessage(msgBuffer);
+  */
+  afficheMessage("Etalonnage terminé,\nscale_ba = %f\nscale_bf = %f", scale_ba, scale_bf);
   #ifdef DEBUG
     Serial.printf("Etalonnage terminé, scale_ba = %f, scale_bf = %f\n", scale_ba, scale_bf);
   #endif

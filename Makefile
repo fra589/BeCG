@@ -53,6 +53,7 @@ VERSION=$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_DATE)
 # Compression des html, css, js et svg
 # from https://github.com/tdewolff/minify (or apt install minify in Debian)
 MINIFY=/usr/bin/minify
+###MINIFY=/usr/bin/cat
 # Mklittlefs tool from https://github.com/earlephilhower/mklittlefs
 # Attention ! Les dernières versions de mklittlefs utilisent LFS_NAME_MAX=128
 # cette configuration n'est pas compatible avec les cartes Wemos D1 mini.

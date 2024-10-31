@@ -1,14 +1,14 @@
 <!doctype html><html lang=fr><meta charset=utf-8><meta name=viewport content="width=device-width"><meta name=description content="Electronic scale for measuring the Center of Gravity of model aircraft."><title>BeCG</title><link rel="shortcut icon" type=image/png href=../favicon.svg><link rel=stylesheet media=screen href=../style.css><script src=../scripts.js></script><body onload=index_onload()><input type=hidden id=paf_ba name=paf_ba value=0.0>
 <input type=hidden id=entraxe name=entraxe value=0.0>
-<input type=hidden id=tare name=tare value=0><table id=entete><tbody><tr><td><div id=logo><img src=../BeCG-couleur.svg></div><td><h2>BeCG - Electronic Centering Scale</h2><td><div id=settings><a href=./settings.html title="Configure the scale..."><img src=../settings.svg></a></div></table><div id=la_page><div id=onglets><span id=onglet1 class="onglet selected" onclick="onglet_click('onglet1')">Measures</span>
-<span id=onglet2 class=onglet onclick="onglet_click('onglet2')">Calculations</span>
-<span id=flag_en class=flag><img src=../flag_en.svg id=flag_actif></span>
-<span id=flag_fr class=flag><img src=../flag_fr.svg onclick=changeLang()></span></div><div id=mesures><h2>Measured masses</h2><p><table><thead><tr><th>leading edge (le)<th>trailing edge (te)<tbody><tr><td id=ba>0.0 g<td id=bf>0.0 g</table><h2>Total mass</h2><h3 id=total>0.0 g</h3><p>&nbsp;<h2>Center of Gravity Position</h2><h3 id=cg>~~~~</h3><p><img src=../profil.svg><div style=float:left><input type=checkbox id=auto_refresh name=auto_refresh onclick=autoRefresh() checked>
+<input type=hidden id=tare name=tare value=0><table id=entete><tbody><tr><td><div id=logo><img src=../BeCG-couleur.svg></div><td><h2>BeCG - Electronic Centering Scale</h2><td><div id=settings><a href=./settings.html title="Configure the scale..."><img src=../settings.svg></a></div></table><div id=la_page><div id=onglets><span id=onglet1 class="onglet selected" onclick='onglet_click("onglet1")'>Measures</span>
+<span id=onglet2 class=onglet onclick='onglet_click("onglet2")'>Calculations</span>
+<span id=flag_en class=flag><img class=flag_actif src=../flag_en.svg onclick='changeLang("en")'></span>
+<span id=flag_fr class=flag><img class=flag_inactif src=../flag_fr.svg onclick='changeLang("fr")'></span></div><div id=mesures><h2>Measured masses</h2><p><table><thead><tr><th>leading edge (le)<th>trailing edge (te)<tbody><tr><td id=ba>0.0 g<td id=bf>0.0 g</table><h2>Total mass</h2><h3 id=total>0.0 g</h3><p>&nbsp;<h2>Center of Gravity Position</h2><h3 id=cg>~~~~</h3><p><img src=../profil.svg><div style=float:left><input type=checkbox id=auto_refresh name=auto_refresh onclick=autoRefresh() checked>
 <label for=auto_refresh>Auto refresh</label></div><p class=alignement-droit><span id=spanApropos onclick=showApropos()>About BeCG...</span>
 <button id=bouton_tare title="Reset scale" onclick=balance_tare()>
 Reset</button>
 &nbsp;
-<button id=bouton_etalonage title="Calibrate the scale..." onclick="afficheDialog('dlgEtalonnage')">
+<button id=bouton_etalonage title="Calibrate the scale..." onclick='afficheDialog("dlgEtalonnage")'>
 Calibrate</button></div><div id=calculs class=noshow><h2>Calculs lest de centrage</h2><p><label for=cg_mesure>Measured CG position (mm/le)</label>
 <input type=number id=cg_mesure name=cg_mesure lang=en value=0.0 readonly><br><label for=masse_mesure>Measured mass (g)</label>
 <input type=number id=masse_mesure name=masse_mesure lang=en value=0.0 readonly><br><br><label for=cg_voulu>Desired CG position (mm/le)</label>
@@ -19,6 +19,6 @@ Calibrate</button></div><div id=calculs class=noshow><h2>Calculs lest de centrag
 <input type=number id=levier_lest name=levier_lest value=0.0 lang=en step=0.1>
 <span id=info_levier_lest>&nbsp;</span><br><br><i>(Ballast lever arm: measured from the leading edge, positive values behind the leading edge and negative values forward.)</i><div><button id=btnSave onclick=sauvegarder()>Save as CSV...</button></div></div></div><p id=heure class=noshow>&nbsp;<hr><p>BeCG AP SSID = <span id=ap_ssid>BeCG_XX:XX:XX</span>&nbsp;---&nbsp;IP = <span id=ap_ip>0.0.0.0</span><br>BeCG client SSID = <span id=cli_ssid>&lt;NA></span>&nbsp;---&nbsp;IP = <span id=cli_ip>0.0.0.0</span><hr><div id=pied_de_page><p>BeCG <span id=version>v0.0.00000000</span> - Copyright © Gauthier Brière (<a href=https://github.com/fra589/BeCG>fra589</a>) - 2023-2024</div><div id=dlgMask0 class="dlgMask noshow"><div id=dlgEtalonnage class="dialog masquer"><div id=dlgContenu0 class=dlgContenu>&nbsp;</div><p class=alignement-droit><button id=btnSuite title=Continue onclick=suite_clique()>
 Next</button>
-<button id=btnClose title="Close this dialog box" onclick="closeDialog('dlgEtalonnage')">
+<button id=btnClose title="Close this dialog box" onclick='closeDialog("dlgEtalonnage")'>
 Close</button></div><div id=cadre_attente><div id=attente0 class="attente noshow"></div></div></div><div id=dlgMask1 class="dlgMask noshow"><div id=dlgApropos class="dialog masquer"><div id=dlgContenu1 class=dlgContenu><span id=imgApropos><img src=../BeCG-couleur.svg></span><span id=apropos_version>v0.0.00000000</span><p style=text-align:left>Electronic balance for measuring and positioning the Center of Gravity of model aircraft.<p>Copyright © Gauthier Brière (<a href=https://github.com/fra589/BeCG>fra589</a>) - 2023</div><p class=alignement-droit><button id=btnClose1 title=Close onclick=closeApropos()>
 Close</button></div></div>

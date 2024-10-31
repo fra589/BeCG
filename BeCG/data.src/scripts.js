@@ -709,13 +709,14 @@ async function etalonnage() {
   document.getElementById("dlgContenu0").innerHTML = msg;
   // Bloque les mesures sur la balance
   XMLHttpRequest_get("/stopmesure");
+
   if (LANG == "en") {
-    XMLHttpRequest_get(encodeURI("/affichage?text=Network calibration\in progress..."));
+    XMLHttpRequest_get(encodeURI("/affichage?text=Network calibration\u000Ain progress..."));
   } else {
-    XMLHttpRequest_get(encodeURI("/affichage?text=Etalonnage réseau\nen cours..."));
+    XMLHttpRequest_get(encodeURI("/affichage?text=Etalonnage réseau\u000Anen cours..."));
   }
   
-  // Attente click sur bouton suite
+  // Attente click sur bouton suite \n
   while (!suiteOK) {
     await sleep(100);
   }
@@ -729,8 +730,12 @@ async function etalonnage() {
   }
   document.getElementById('btnClose').disabled = true;
   
-  // Affiche la suite continuer la traduction a partir d'ici : GBGB
-  msg = "<p>Remise à zéro<br />des balances...</p>";
+  // Affiche la suite
+  if (LANG == "en") {
+    msg = "<p>Resetting<br />the scales...</p>";
+  } else {
+    msg = "<p>Remise à zéro<br />des balances...</p>";
+  }
   document.getElementById("dlgContenu0").innerHTML = msg;
 
   // Préparation de l'étalonnage (reset scale) et remise à zéro des balances (tare)
@@ -750,9 +755,17 @@ async function etalonnage() {
   attenteOK = false;
   divWait.classList.add("noshow");
 
-  XMLHttpRequest_get("/affichage?text=Etalonnage réseau\nen cours...");
+  if (LANG == "en") {
+    XMLHttpRequest_get(encodeURI("/affichage?text=Network calibration\u000Ain progress..."));
+  } else {
+    XMLHttpRequest_get(encodeURI("/affichage?text=Etalonnage réseau\u000Anen cours..."));
+  }
 
-  msg = "<p>Placez une masse de<br />" + tare + " g sur la balance<br />coté bord d'attaque, puis<br />Cliquez sur \"Suivant\".</p>"; 
+  if (LANG == "en") {
+    msg = "<p>Place a weight of<br />" + tare + " g on the scale<br />on the leading edge side, then<br />Click on \"Next\".</p>";
+  } else {
+    msg = "<p>Placez une masse de<br />" + tare + " g sur la balance<br />coté bord d'attaque, puis<br />Cliquez sur \"Suivant\".</p>"; 
+  }
   document.getElementById("dlgContenu0").innerHTML = msg;
 
   // Attente click sur bouton suite
@@ -762,7 +775,11 @@ async function etalonnage() {
   suiteOK = false;
   
   // Affiche la suite
-  msg = "<p>Mesure de la tare<br />bord d'attaque...</p>";
+  if (LANG == "en") {
+    msg = "<p>Tare measurement<br />leading edge...</p>";
+  } else {
+    msg = "<p>Mesure de la tare<br />bord d'attaque...</p>";
+  }
   document.getElementById("dlgContenu0").innerHTML = msg;
 
   // Mesure tare BA
@@ -776,9 +793,17 @@ async function etalonnage() {
   attenteOK = false;
   divWait.classList.add("noshow");
 
-  XMLHttpRequest_get("/affichage?text=Etalonnage réseau\nen cours...");
+  if (LANG == "en") {
+    XMLHttpRequest_get(encodeURI("/affichage?text=Network calibration\u000Ain progress..."));
+  } else {
+    XMLHttpRequest_get(encodeURI("/affichage?text=Etalonnage réseau\u000Anen cours..."));
+  }
 
-  msg = "<p>Placez une masse de<br />" + tare + " g sur la balance<br />coté bord de fuite, puis<br/>Cliquez sur \"Suivant\".</p>"; 
+  if (LANG == "en") {
+    msg = "<p>Place a weight of<br />" + tare + " g on the scale<br />on the trailing edge side, then<br />Click on \"Next\".</p>";
+  } else {
+    msg = "<p>Placez une masse de<br />" + tare + " g sur la balance<br />coté bord de fuite, puis<br/>Cliquez sur \"Suivant\".</p>"; 
+  }
   document.getElementById("dlgContenu0").innerHTML = msg;
 
   // Attente click sur bouton suite
@@ -788,7 +813,11 @@ async function etalonnage() {
   suiteOK = false;
   
   // Affiche la suite
-  msg = "<p>Mesure de la tare<br />bord de fuite...</p>";
+  if (LANG == "en") {
+    msg = "<p>Tare measurement<br />trailing edge...</p>";
+  } else {
+    msg = "<p>Mesure de la tare<br />bord de fuite...</p>";
+  }
   document.getElementById("dlgContenu0").innerHTML = msg;
 
   // Mesure tare BF
@@ -803,7 +832,11 @@ async function etalonnage() {
   divWait.classList.add("noshow");
 
   // Affiche la suite
-  msg = "<p>Etalonnage terminé,<br />- nscale_ba = " + scale_ba + "<br />- nscale_bf = " + scale_bf + "</p>";
+  if (LANG == "en") {
+    msg = "<p>Calibration completed,<br />- nscale_ba = " + scale_ba + "<br />- nscale_bf = " + scale_bf + "</p>";
+  } else {
+    msg = "<p>Etalonnage terminé,<br />- nscale_ba = " + scale_ba + "<br />- nscale_bf = " + scale_bf + "</p>";
+  }
   document.getElementById("dlgContenu0").innerHTML = msg;
 
   // Réinitialise l'affichage et relance les mesures sur la balance
@@ -928,12 +961,12 @@ function closeApropos() {
   }, 0.25);
 }
 
-function changeLang() {
-  if (LANG == "en") {
-    XMLHttpRequest_get("/setlang?lang=fr");
-    location.href = "/fr/index.html";
+function changeLang(newLang) {
+  if (newLang == "en") {
+    // redirection faite par /setlang
+    location.href = "/setlang?lang=en";
   } else {
-    XMLHttpRequest_get("/setlang?lang=en");
-    location.href = "/en/index.html";
+    // redirection faite par /setlang
+    location.href = "/setlang?lang=fr";
   }
 }
